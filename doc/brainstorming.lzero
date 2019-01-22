@@ -1,0 +1,94 @@
+
+
+/*
+ *  Sole syntax:
+ *
+ *  element
+ *    : documentation? annotations? KEYWORD IDENTIFIER? ( "(" parameters? ")" )? ( ":" type )? content
+ *    ;
+ *
+ *  documentation
+ *    : documentationLine+
+ *    ;
+ *
+ *  documentationLine
+ *    : "!" [^\n]* "\n"
+ *    ;
+ *
+ *  annotations
+ *    : annotation+
+ *    ;
+ *
+ *  annotation
+ *    : identifier ( "(" arguments ")" )?
+ *    ;
+ *
+ *  parameters
+ *    : parameter ( "," parameter )*
+ *    ;
+ *
+ *  parameter
+ *    : identifier ( ":" type )? ( "=" expression )?
+ *    ;
+ *
+ *  type
+ *    : identifier ( "(" arguments ")" )?
+ *    ;
+ *
+ *  content
+ *    : "{" element* "}"
+ *    : "=" expression
+ *    : "(" expression ")"
+ *    : ";"
+ *    ;
+ *
+ *  arguments
+ *    : argument ( "," argument )*
+ *    ;
+ *
+ *  argument
+ *    : ( identifier "=" )? expression
+ *    ;
+ *
+ *  expression
+ *    : // TODO
+ *    ;
+ *
+ *
+ *  KEYWORD
+ *    : "#" IDENTIFIER
+ *    ;
+ *
+ *  IDENTIFIER
+ *    : [A-Za-z_] [A-Za-z_0-9]*
+ *    : "`" [^`]* "`"
+ *    ;
+ */
+#package example {
+
+    public #class Sample(a:Int, b: String) {
+
+        ! Computes the square of its argument [x].
+        public #function f(x:Int):Int =
+            x * x
+
+        ! Just some funky text string.
+        ! It has an initializer.
+        private #field q : String = "Very nice."
+
+        ! Function that can be called from derived classes.
+        protected #function g(s:String) {
+            #let result = s + " whatever"
+            #return (result)
+        }
+
+    }
+
+    #object x : Sample (a=3, b=4) {
+        #collection children: List(String) {
+            #string( "q" )
+            #string( "r" )
+        }
+    }
+
+}
