@@ -3,7 +3,7 @@
 // Apache 2.0 License
 //
 
-package i.lzero.domain.scanning
+package lzero.domain.scanning
 
 //---------------------------------------------------------------------------------------------------------------------
 

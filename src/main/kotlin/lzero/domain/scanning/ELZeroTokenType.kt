@@ -3,7 +3,7 @@
 // Apache 2.0 License
 //
 
-package i.lzero.domain.scanning
+package lzero.domain.scanning
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -36,6 +36,14 @@ enum class ELZeroTokenType(
     /* Documentation */
     DOCUMENTATION_LINE( "[documentation]" ),
 
+    /** Errors */
+    EMPTY_KEYWORD( "[empty keyword]" ),
+    INVALID_CHARACTER( "[invalid character]" ),
+    UNTERMINATED_CHARACTER_LITERAL( "[unterminated character literal]" ),
+    UNTERMINATED_QUOTED_IDENTIFIER( "[unterminated quoted identifier]" ),
+    UNTERMINATED_STRING_LITERAL( "[unterminated string literal]" ),
+
+    /** End of input. */
     END_OF_INPUT( "[end of input]");
 
     ////

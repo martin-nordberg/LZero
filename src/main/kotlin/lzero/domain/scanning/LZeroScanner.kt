@@ -3,16 +3,23 @@
 // Apache 2.0 License
 //
 
-package i.lzero.domain.scanning
+package lzero.domain.scanning
 
 import java.lang.Character.*
 
 //---------------------------------------------------------------------------------------------------------------------
 
+/**
+ * Scanner for L-Zero code. Orchestrates the given [input] tokenizer to produce the individual tokens of a string
+ * of raw L-Zero code.
+ */
 class LZeroScanner(
-    private val input: CharBuffer
+    private val input: StringTokenizer
 ) {
 
+    /**
+     * Reads the next token from the input.
+     */
     fun scan() : LZeroToken {
 
         var nextChar = input.lookAhead()
@@ -31,6 +38,10 @@ class LZeroScanner(
             return scanIdentifier()
         }
 
+        if ( nextChar == '!' ) {
+            return scanDocumentationLine()
+        }
+
         if ( nextChar == '#' ) {
             return scanKeyword()
         }
@@ -47,44 +58,45 @@ class LZeroScanner(
             return scanNumericLiteral()
         }
 
-        if ( nextChar == '!' ) {
-            return scanDocumentationLine()
+        if (nextChar == '`') {
+            return scanQuotedIdentifier()
         }
 
-        if ( nextChar == CharBuffer.END_OF_INPUT_CHAR ) {
-            input.mark()
-            return input.extractTokenFromMark(ELZeroTokenType.END_OF_INPUT)
-        }
-
-        // TODO: add line & column
-        throw IllegalArgumentException( "Unrecognized character: '$nextChar'.")
+        return input.extractTokenFromMark(ELZeroTokenType.INVALID_CHARACTER)
 
     }
 
     ////
 
-    private fun isIdentifierPart(nextChar: Char) =
-        isJavaIdentifierPart(nextChar) && nextChar != CharBuffer.END_OF_INPUT_CHAR
+    /**
+     * @return true if the given [character] can be part of an identifier (after its first character).
+     */
+    private fun isIdentifierPart(character: Char) =
+        isJavaIdentifierPart(character) && character != StringTokenizer.END_OF_INPUT_CHAR
 
-    private fun isIdentifierStart(nextChar: Char) =
-        isJavaIdentifierStart(nextChar) && nextChar != CharBuffer.END_OF_INPUT_CHAR
+    /**
+     * @return true if the given [character] can be the first character of an identifier.
+     */
+    private fun isIdentifierStart(character: Char) =
+        isJavaIdentifierStart(character) && character != StringTokenizer.END_OF_INPUT_CHAR
 
-    private fun isKeywordPart(nextChar: Char) =
-        isJavaIdentifierPart(nextChar) && nextChar != CharBuffer.END_OF_INPUT_CHAR
+    /**
+     * @return true if the given [character] can be part of a keyword (after its opening '#' character).
+     */
+    private fun isKeywordPart(character: Char) =
+        isJavaIdentifierPart(character) && character != StringTokenizer.END_OF_INPUT_CHAR
 
+    /**
+     * Scans a character literal token after its opening "'" character has been marked and consumed in the tokenizer.
+     */
     private fun scanCharacterLiteral() : LZeroToken {
 
         var nextChar = input.lookAhead()
 
         while ( nextChar != '\'' ) {
 
-            if ( nextChar == '\n' ) {
-                // TODO: more info
-                throw IllegalArgumentException( "Character literal extends past end of line." )
-            }
-
-            if ( nextChar == CharBuffer.END_OF_INPUT_CHAR ) {
-                throw IllegalArgumentException( "Character literal extends to end of input." )
+            if ( nextChar == '\n' || nextChar == StringTokenizer.END_OF_INPUT_CHAR ) {
+                return input.extractTokenFromMark(ELZeroTokenType.UNTERMINATED_CHARACTER_LITERAL)
             }
 
             nextChar = input.advanceAndLookAhead()
@@ -95,11 +107,14 @@ class LZeroScanner(
 
     }
 
+    /**
+     * Scans a line of documentation after its opening "!" character has been marked and consumed in the tokenizer.
+     */
     private fun scanDocumentationLine() : LZeroToken {
 
         var nextChar = input.advanceAndLookAhead()
 
-        while ( nextChar != '\n' && nextChar != CharBuffer.END_OF_INPUT_CHAR ) {
+        while ( nextChar != '\n' && nextChar != StringTokenizer.END_OF_INPUT_CHAR ) {
             nextChar = input.advanceAndLookAhead()
         }
 
@@ -107,6 +122,10 @@ class LZeroScanner(
 
     }
 
+    /**
+     * Scans a floating point literal after marking the first digit and consuming up until (but not including) the
+     * first character seen that distinguishes it from an integer literal.
+     */
     private fun scanFloatingPointLiteral() : LZeroToken {
 
         var nextChar = input.lookAhead()
@@ -143,6 +162,9 @@ class LZeroScanner(
 
     }
 
+    /**
+     * Scans an identifier after its first character has been marked and consumed.
+     */
     private fun scanIdentifier() : LZeroToken {
 
         while ( isIdentifierPart( input.lookAhead() ) ) {
@@ -153,16 +175,29 @@ class LZeroScanner(
 
     }
 
+    /**
+     * Scans a keyword after its opening '#' character has been marked and consumed.
+     */
     private fun scanKeyword() : LZeroToken {
+
+        var atLeastOneCharacterSeen = false
 
         while ( isKeywordPart( input.lookAhead() ) ) {
             input.advance()
+            atLeastOneCharacterSeen = true
+        }
+
+        if ( !atLeastOneCharacterSeen ) {
+            return input.extractTokenFromMark(ELZeroTokenType.EMPTY_KEYWORD)
         }
 
         return input.extractTokenFromMark(ELZeroTokenType.KEYWORD)
 
     }
 
+    /**
+     * Scans a numerical literal (integer or floating point) after its first numeric digit has been marked and consumed.
+     */
     private fun scanNumericLiteral() : LZeroToken {
 
         var nextChar = input.lookAhead()
@@ -186,19 +221,38 @@ class LZeroScanner(
 
     }
 
+    /**
+     * Scans a backtick-quoted identifier after the open "`" character has been marked and consumed.
+     */
+    private fun scanQuotedIdentifier() : LZeroToken {
+
+        var nextChar = input.lookAhead()
+
+        while ( nextChar != '`' ) {
+
+            if ( nextChar == '\n' || nextChar == StringTokenizer.END_OF_INPUT_CHAR ) {
+                return input.extractTokenFromMark(ELZeroTokenType.UNTERMINATED_QUOTED_IDENTIFIER)
+            }
+
+            nextChar = input.advanceAndLookAhead()
+
+        }
+
+        return input.advanceAndExtractTokenFromMark(ELZeroTokenType.IDENTIFIER)
+
+    }
+
+    /**
+     * Scans a string literal after the opening double quote character has been marked and consumed.
+     */
     private fun scanStringLiteral() : LZeroToken {
 
         var nextChar = input.lookAhead()
 
         while ( nextChar != '"' ) {
 
-            if ( nextChar == '\n' ) {
-                // TODO: more info
-                throw IllegalArgumentException( "String literal extends past end of line." )
-            }
-
-            if ( nextChar == CharBuffer.END_OF_INPUT_CHAR ) {
-                throw IllegalArgumentException( "String literal extends to end of input." )
+            if ( nextChar == '\n' || nextChar == StringTokenizer.END_OF_INPUT_CHAR ) {
+                return input.extractTokenFromMark(ELZeroTokenType.UNTERMINATED_STRING_LITERAL)
             }
 
             nextChar = input.advanceAndLookAhead()
@@ -213,8 +267,10 @@ class LZeroScanner(
 
     companion object {
 
+        /** Characters that distinguish a floating point literal from an integer literal. */
         private val FLOATING_POINT_STARTERS = setOf( '.', 'd', 'D', 'e', 'E', 'f', 'F' )
 
+        /** Characters that serve as tokens of length one. */
         private val ONE_CHARACTER_TOKENS = mapOf(
             ':' to ELZeroTokenType.COLON,
             ',' to ELZeroTokenType.COMMA,
@@ -223,7 +279,8 @@ class LZeroScanner(
             '{' to ELZeroTokenType.LBRACE,
             '(' to ELZeroTokenType.LPAREN,
             '}' to ELZeroTokenType.RBRACE,
-            ')' to ELZeroTokenType.RPAREN
+            ')' to ELZeroTokenType.RPAREN,
+            StringTokenizer.END_OF_INPUT_CHAR to ELZeroTokenType.END_OF_INPUT
         )
 
     }

@@ -3,48 +3,28 @@
 // Apache 2.0 License
 //
 
-package jvm.lzero.domain.scanning
+package lzero.domain.scanning
 
-import i.lzero.domain.scanning.CharBuffer
-import i.lzero.domain.scanning.ELZeroTokenType
-import i.lzero.domain.scanning.LZeroScanner
-import i.lzero.domain.scanning.LZeroToken
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
 
 //---------------------------------------------------------------------------------------------------------------------
 
 @Suppress("RemoveRedundantBackticks")
-class LZeroScannerTests {
-
-    private fun checkScan( code: String, vararg expectedTokens: LZeroToken) {
-        val scanner = LZeroScanner( CharBuffer( code ) )
-
-        for ( expectedToken in expectedTokens ) {
-            val token = scanner.scan()
-            assertEquals( expectedToken.type, token.type )
-            assertEquals( expectedToken.text, token.text )
-            assertEquals( expectedToken.line, token.line )
-            assertEquals( expectedToken.column, token.column )
-        }
-
-        assertEquals( ELZeroTokenType.END_OF_INPUT, scanner.scan().type )
-    }
-
-    ////
+class LZeroScannerSimpleTests
+    : LZeroScannerTests() {
 
     @Test
     fun `Single character tokens are scanned`() {
 
         checkScan(
             " { } ( ) . : , = ",
-            LZeroToken( ELZeroTokenType.LBRACE, "{", 1,2),
-            LZeroToken( ELZeroTokenType.RBRACE, "}", 1,4),
-            LZeroToken( ELZeroTokenType.LPAREN, "(", 1,6 ),
-            LZeroToken( ELZeroTokenType.RPAREN, ")", 1,8),
-            LZeroToken( ELZeroTokenType.DOT, ".", 1,10),
-            LZeroToken( ELZeroTokenType.COLON, ":", 1,12),
-            LZeroToken(ELZeroTokenType.COMMA, ",", 1,14),
+            LZeroToken(ELZeroTokenType.LBRACE, "{", 1, 2),
+            LZeroToken(ELZeroTokenType.RBRACE, "}", 1, 4),
+            LZeroToken(ELZeroTokenType.LPAREN, "(", 1, 6),
+            LZeroToken(ELZeroTokenType.RPAREN, ")", 1, 8),
+            LZeroToken(ELZeroTokenType.DOT, ".", 1, 10),
+            LZeroToken(ELZeroTokenType.COLON, ":", 1, 12),
+            LZeroToken(ELZeroTokenType.COMMA, ",", 1, 14),
             LZeroToken(ELZeroTokenType.EQ, "=", 1, 16)
         )
 
@@ -61,6 +41,17 @@ class LZeroScannerTests {
             LZeroToken(ELZeroTokenType.IDENTIFIER, "_", 1, 14),
             LZeroToken(ELZeroTokenType.IDENTIFIER, "_something", 1, 16),
             LZeroToken(ELZeroTokenType.IDENTIFIER, "rr_12_pq", 1, 27)
+        )
+
+    }
+
+    @Test
+    fun `Quoted identifiers are scanned`() {
+
+        checkScan(
+            " `a` `this one - has punctuation; really`",
+            LZeroToken(ELZeroTokenType.IDENTIFIER, "`a`", 1, 2),
+            LZeroToken(ELZeroTokenType.IDENTIFIER, "`this one - has punctuation; really`", 1, 6)
         )
 
     }
