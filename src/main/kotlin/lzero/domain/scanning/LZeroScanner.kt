@@ -20,48 +20,69 @@ class LZeroScanner(
     /**
      * Reads the next token from the input.
      */
-    fun scan() : LZeroToken {
+    fun scan(): LZeroToken {
 
         var nextChar = input.lookAhead()
 
-        while ( isWhitespace(nextChar) ) {
+        // Ignore whitespace.
+        while (isWhitespace(nextChar)) {
             nextChar = input.advanceAndLookAhead()
         }
 
+        // Consume the one character after marking the start of a token.
         input.markAndAdvance()
 
-        if ( ONE_CHARACTER_TOKENS.containsKey(nextChar) ) {
-            return input.extractTokenFromMark(ONE_CHARACTER_TOKENS.get(nextChar)!!)
+        if (ONE_CHARACTER_TOKENS.containsKey(nextChar)) {
+            return input.extractTokenFromMark(ONE_CHARACTER_TOKENS.getValue(nextChar))
         }
 
+        // Scan an identifier.
         if (isIdentifierStart(nextChar)) {
             return scanIdentifier()
         }
 
-        if ( nextChar == '!' ) {
-            return scanDocumentationLine()
+        // Scan a block of documentation.
+        if (nextChar == '/' && input.lookAhead() == '*') {
+            input.advance()
+            return scanDocumentation()
         }
 
-        if ( nextChar == '#' ) {
-            return scanKeyword()
+        // Scan a concept keyword.
+        if (nextChar == '#') {
+            return scanConceptKeyword()
         }
 
-        if ( nextChar == '"' ) {
+        // Scan a connector keyword.
+        if (nextChar == '~') {
+            return scanConnectorKeyword()
+        }
+
+        // Scan a string literal.
+        if (nextChar == '"') {
             return scanStringLiteral()
         }
 
-        if ( nextChar == '\'' ) {
+        // Scan a character literal.
+        if (nextChar == '\'') {
             return scanCharacterLiteral()
         }
 
-        if ( isDigit(nextChar) ) {
+        // Scan a numeric literal (integer or floating point).
+        if (isDigit(nextChar)) {
             return scanNumericLiteral()
         }
 
+        // Scan an identifier enclosed in back ticks.
         if (nextChar == '`') {
             return scanQuotedIdentifier()
         }
 
+        // Scan a UUID.
+        if (nextChar == '%') {
+            return scanUuid()
+        }
+
+        // Error - nothing else it could be.
         return input.extractTokenFromMark(ELZeroTokenType.INVALID_CHARACTER)
 
     }
@@ -81,21 +102,28 @@ class LZeroScanner(
         isJavaIdentifierStart(character) && character != StringTokenizer.END_OF_INPUT_CHAR
 
     /**
-     * @return true if the given [character] can be part of a keyword (after its opening '#' character).
+     * @return true if the given [character] can be part of a keyword.
      */
     private fun isKeywordPart(character: Char) =
         isJavaIdentifierPart(character) && character != StringTokenizer.END_OF_INPUT_CHAR
 
     /**
+     * @return true if the given [character] can be the first character of a keyword (after its opening '#' or '~'
+     *         character).
+     */
+    private fun isKeywordStart(character: Char) =
+        isJavaIdentifierStart(character) && character != StringTokenizer.END_OF_INPUT_CHAR
+
+    /**
      * Scans a character literal token after its opening "'" character has been marked and consumed in the tokenizer.
      */
-    private fun scanCharacterLiteral() : LZeroToken {
+    private fun scanCharacterLiteral(): LZeroToken {
 
         var nextChar = input.lookAhead()
 
-        while ( nextChar != '\'' ) {
+        while (nextChar != '\'') {
 
-            if ( nextChar == '\n' || nextChar == StringTokenizer.END_OF_INPUT_CHAR ) {
+            if (nextChar == '\n' || nextChar == StringTokenizer.END_OF_INPUT_CHAR) {
                 return input.extractTokenFromMark(ELZeroTokenType.UNTERMINATED_CHARACTER_LITERAL)
             }
 
@@ -108,17 +136,28 @@ class LZeroScanner(
     }
 
     /**
-     * Scans a line of documentation after its opening "!" character has been marked and consumed in the tokenizer.
+     * Scans a block of documentation after its opening '/' and '*' characters have been marked and consumed in
+     * the tokenizer.
      */
-    private fun scanDocumentationLine() : LZeroToken {
+    private fun scanDocumentation(): LZeroToken {
 
-        var nextChar = input.advanceAndLookAhead()
+        var nextChar = input.lookAhead()
 
-        while ( nextChar != '\n' && nextChar != StringTokenizer.END_OF_INPUT_CHAR ) {
-            nextChar = input.advanceAndLookAhead()
+        while(true) {
+
+            if (nextChar == StringTokenizer.END_OF_INPUT_CHAR) {
+                return input.extractTokenFromMark(ELZeroTokenType.UNTERMINATED_DOCUMENTATION)
+            }
+
+            input.advance()
+
+            if (nextChar == '*' && input.lookAhead() == '/' ) {
+                return input.advanceAndExtractTokenFromMark(ELZeroTokenType.DOCUMENTATION)
+            }
+
+            nextChar = input.lookAhead()
+
         }
-
-        return input.extractTokenFromMark(ELZeroTokenType.DOCUMENTATION_LINE)
 
     }
 
@@ -126,35 +165,35 @@ class LZeroScanner(
      * Scans a floating point literal after marking the first digit and consuming up until (but not including) the
      * first character seen that distinguishes it from an integer literal.
      */
-    private fun scanFloatingPointLiteral() : LZeroToken {
+    private fun scanFloatingPointLiteral(): LZeroToken {
 
         var nextChar = input.lookAhead()
 
-        if ( nextChar == '.' ) {
+        if (nextChar == '.') {
 
             nextChar = input.advanceAndLookAhead()
 
-            while ( isDigit(nextChar) || '_' == nextChar ) {
+            while (isDigit(nextChar) || '_' == nextChar) {
                 nextChar = input.advanceAndLookAhead()
             }
 
         }
 
-        if ( nextChar == 'e' || nextChar == 'E' ) {
+        if (nextChar == 'e' || nextChar == 'E') {
 
             nextChar = input.advanceAndLookAhead()
 
-            if ( nextChar == '-' || nextChar == '+' ) {
+            if (nextChar == '-' || nextChar == '+') {
                 nextChar = input.advanceAndLookAhead()
             }
 
-            while ( isDigit(nextChar) || '_' == nextChar ) {
+            while (isDigit(nextChar) || '_' == nextChar) {
                 nextChar = input.advanceAndLookAhead()
             }
 
         }
 
-        if ( nextChar == 'd' || nextChar=='D' || nextChar == 'f' || nextChar=='F') {
+        if (nextChar == 'd' || nextChar == 'D' || nextChar == 'f' || nextChar == 'F') {
             input.advance()
         }
 
@@ -165,9 +204,9 @@ class LZeroScanner(
     /**
      * Scans an identifier after its first character has been marked and consumed.
      */
-    private fun scanIdentifier() : LZeroToken {
+    private fun scanIdentifier(): LZeroToken {
 
-        while ( isIdentifierPart( input.lookAhead() ) ) {
+        while (isIdentifierPart(input.lookAhead())) {
             input.advance()
         }
 
@@ -176,36 +215,54 @@ class LZeroScanner(
     }
 
     /**
-     * Scans a keyword after its opening '#' character has been marked and consumed.
+     * Scans a concept keyword after its opening '#' character has been marked and consumed.
      */
-    private fun scanKeyword() : LZeroToken {
+    private fun scanConceptKeyword(): LZeroToken {
 
-        var atLeastOneCharacterSeen = false
-
-        while ( isKeywordPart( input.lookAhead() ) ) {
+        if (isKeywordStart(input.lookAhead())) {
             input.advance()
-            atLeastOneCharacterSeen = true
+        } else {
+            return input.extractTokenFromMark(ELZeroTokenType.HASH)
         }
 
-        if ( !atLeastOneCharacterSeen ) {
-            return input.extractTokenFromMark(ELZeroTokenType.EMPTY_KEYWORD)
+        while (isKeywordPart(input.lookAhead())) {
+            input.advance()
         }
 
-        return input.extractTokenFromMark(ELZeroTokenType.KEYWORD)
+        return input.extractTokenFromMark(ELZeroTokenType.CONCEPT_KEYWORD)
+
+    }
+
+    /**
+     * Scans a connector keyword after its opening '~' character has been marked and consumed.
+     */
+    private fun scanConnectorKeyword(): LZeroToken {
+
+        if (isKeywordStart(input.lookAhead())) {
+            input.advance()
+        } else {
+            return input.extractTokenFromMark(ELZeroTokenType.TILDE)
+        }
+
+        while (isKeywordPart(input.lookAhead())) {
+            input.advance()
+        }
+
+        return input.extractTokenFromMark(ELZeroTokenType.CONNECTOR_KEYWORD)
 
     }
 
     /**
      * Scans a numerical literal (integer or floating point) after its first numeric digit has been marked and consumed.
      */
-    private fun scanNumericLiteral() : LZeroToken {
+    private fun scanNumericLiteral(): LZeroToken {
 
         var nextChar = input.lookAhead()
-        while ( isDigit( nextChar ) || '_' == nextChar ) {
+        while (isDigit(nextChar) || '_' == nextChar) {
             nextChar = input.advanceAndLookAhead()
         }
 
-        if ( FLOATING_POINT_STARTERS.contains(nextChar) ) {
+        if (FLOATING_POINT_STARTERS.contains(nextChar)) {
             return scanFloatingPointLiteral()
         }
 
@@ -213,7 +270,7 @@ class LZeroScanner(
 
         // TODO: binary
 
-        if ( nextChar == 'l' || nextChar=='L') {
+        if (nextChar == 'l' || nextChar == 'L') {
             input.advance()
         }
 
@@ -224,13 +281,13 @@ class LZeroScanner(
     /**
      * Scans a backtick-quoted identifier after the open "`" character has been marked and consumed.
      */
-    private fun scanQuotedIdentifier() : LZeroToken {
+    private fun scanQuotedIdentifier(): LZeroToken {
 
         var nextChar = input.lookAhead()
 
-        while ( nextChar != '`' ) {
+        while (nextChar != '`') {
 
-            if ( nextChar == '\n' || nextChar == StringTokenizer.END_OF_INPUT_CHAR ) {
+            if (nextChar == '\n' || nextChar == StringTokenizer.END_OF_INPUT_CHAR) {
                 return input.extractTokenFromMark(ELZeroTokenType.UNTERMINATED_QUOTED_IDENTIFIER)
             }
 
@@ -245,13 +302,13 @@ class LZeroScanner(
     /**
      * Scans a string literal after the opening double quote character has been marked and consumed.
      */
-    private fun scanStringLiteral() : LZeroToken {
+    private fun scanStringLiteral(): LZeroToken {
 
         var nextChar = input.lookAhead()
 
-        while ( nextChar != '"' ) {
+        while (nextChar != '"') {
 
-            if ( nextChar == '\n' || nextChar == StringTokenizer.END_OF_INPUT_CHAR ) {
+            if (nextChar == '\n' || nextChar == StringTokenizer.END_OF_INPUT_CHAR) {
                 return input.extractTokenFromMark(ELZeroTokenType.UNTERMINATED_STRING_LITERAL)
             }
 
@@ -263,23 +320,76 @@ class LZeroScanner(
 
     }
 
+    /**
+     * Scans a UUID after the initial '%' character has been consumed.
+     */
+    private fun scanUuid(): LZeroToken {
+
+        val uuidChars = "abcdefABCDEF1234567890"
+
+        fun readUuidChars(nChars: Int): Boolean {
+            for (i in 1..nChars) {
+                val nextChar = input.lookAhead()
+                if (!uuidChars.contains(nextChar)) {
+                    return false
+                }
+                input.advance()
+            }
+            return true
+        }
+
+        fun readDash(): Boolean {
+            val nextChar = input.lookAhead()
+            if (nextChar == '-') {
+                input.advance()
+                return true
+            }
+            return false
+        }
+
+        if (!readUuidChars(1)) {
+            return input.extractTokenFromMark(ELZeroTokenType.PERCENT)
+        }
+
+        val scanned = readUuidChars(7) && readDash() &&
+                readUuidChars(4) && readDash() &&
+                readUuidChars(4) && readDash() &&
+                readUuidChars(4) && readDash() &&
+                readUuidChars(12)
+
+        if (scanned) {
+            return input.extractTokenFromMark(ELZeroTokenType.UUID)
+        }
+
+        while (readUuidChars(1) || readDash()) {
+            // keep consuming
+        }
+
+        return input.extractTokenFromMark(ELZeroTokenType.INVALID_UUID_LITERAL)
+
+    }
+
     ////
 
     companion object {
 
         /** Characters that distinguish a floating point literal from an integer literal. */
-        private val FLOATING_POINT_STARTERS = setOf( '.', 'd', 'D', 'e', 'E', 'f', 'F' )
+        private val FLOATING_POINT_STARTERS = setOf('.', 'd', 'D', 'e', 'E', 'f', 'F')
 
         /** Characters that serve as tokens of length one. */
         private val ONE_CHARACTER_TOKENS = mapOf(
             ':' to ELZeroTokenType.COLON,
             ',' to ELZeroTokenType.COMMA,
+            '-' to ELZeroTokenType.DASH,
             '.' to ELZeroTokenType.DOT,
             '=' to ELZeroTokenType.EQ,
-            '{' to ELZeroTokenType.LBRACE,
-            '(' to ELZeroTokenType.LPAREN,
-            '}' to ELZeroTokenType.RBRACE,
-            ')' to ELZeroTokenType.RPAREN,
+            '{' to ELZeroTokenType.LEFT_BRACE,
+            '[' to ELZeroTokenType.LEFT_BRACKET,
+            '(' to ELZeroTokenType.LEFT_PARENTHESIS,
+            '}' to ELZeroTokenType.RIGHT_BRACE,
+            ']' to ELZeroTokenType.RIGHT_BRACKET,
+            ')' to ELZeroTokenType.RIGHT_PARENTHESIS,
+            ';' to ELZeroTokenType.SEMICOLON,
             StringTokenizer.END_OF_INPUT_CHAR to ELZeroTokenType.END_OF_INPUT
         )
 

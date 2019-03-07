@@ -4,7 +4,7 @@
  *  Sole syntax:
  *
  *  element
- *    : documentation? annotations? KEYWORD IDENTIFIER? ( "(" parameters? ")" )? ( ":" type )? content
+ *    : documentation? annotations? concept qualifiedName? uuid? ( "(" parameters? ")" )? ( connections | ";" )
  *    ;
  *
  *  documentation
@@ -23,6 +23,18 @@
  *    : identifier ( "(" arguments ")" )?
  *    ;
  *
+ *  concept
+ *    : CONCEPT_KEYWORD
+ *    ;
+ *
+ *  qualifiedName
+ *    : name ( "." name )*
+ *    ;
+ *
+ *  name
+ *    : IDENTIFIER
+ *    ;
+ *
  *  parameters
  *    : parameter ( "," parameter )*
  *    ;
@@ -35,11 +47,26 @@
  *    : identifier ( "(" arguments ")" )?
  *    ;
  *
- *  content
- *    : "{" element* "}"
+ *  connections
+ *    : connection+ containment?
+ *    : containment
+ *    ;
+ *
+ *  connection
+ *    : CONNECTOR_KEYWORD ( "(" parameters? ")" )? "~" connected
+ *    : ":" connected
+ *    ;
+ *
+ *  connected
+ *    : qualifiedName
+ *    : uuid
+ *    : "[" ( element ","? )* "]"
+ *    : "(" expression  ")"
+ *    ;
+ *
+ *  containment
+ *    : "{" element "}"
  *    : "=" expression
- *    : "(" expression ")"
- *    : ";"
  *    ;
  *
  *  arguments
@@ -55,40 +82,62 @@
  *    ;
  *
  *
- *  KEYWORD
+ *  CONCEPT_KEYWORD
  *    : "#" IDENTIFIER
+ *    ;
+ *
+ *  CONNECTOR_KEYWORD
+ *    : "~" IDENTIFIER
  *    ;
  *
  *  IDENTIFIER
  *    : [A-Za-z_] [A-Za-z_0-9]*
  *    : "`" [^`]* "`"
  *    ;
+ *
+ *  UUID
+ *    : "%" [A-Fa-f0-9]{8} "-" [A-Fa-f0-9]{4} "-" [A-Fa-f0-9]{4} "-" [A-Fa-f0-9]{4} "-" [A-Fa-f0-9]{12}
+ *    ;
  */
+
+
 #package example {
 
-    public #class Sample(a:Int, b: String) {
+    #function q(x:Int,y:Double) ~returns~ Double {
+        pow(y, x)
+    }
 
-        ! Computes the square of its argument [x].
-        public #function f(x:Int):Int =
-            x * x
+    public #class Sample(T: Type, a:Int, b: String) {
 
-        ! Just some funky text string.
-        ! It has an initializer.
+        /* Computes the square of its argument [x]. */
+        public #function f(x:Int) : Int =
+            times( x, x )
+
+        /*
+           Just some funky text string.
+           It has an initializer.
+        */
         private #field q : String = "Very nice."
 
-        ! Function that can be called from derived classes.
-        protected #function g(s:String) {
+        /* Function that can be called from derived classes. */
+        protected #function g %1111-11111111-11111111-1111-1111 (s:String) {
             #let result = s + " whatever"
-            #return (result)
+            #return result
         }
 
     }
 
-    #object x : Sample (a=3, b=4) {
+    #object x ~extends~ Sample(T)(a=3, b=4) {
         #collection children: List(String) {
-            #string( "q" )
-            #string( "r" )
+            "q"
+            "r"
         }
     }
 
 }
+
+/* sample connection of packages */
+#package example.sample
+    ~uses~ somelibrary.goodstuff
+    ~uses~ anotherlib.badstuff
+

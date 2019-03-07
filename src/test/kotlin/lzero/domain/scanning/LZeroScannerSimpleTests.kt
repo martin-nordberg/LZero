@@ -17,15 +17,19 @@ class LZeroScannerSimpleTests
     fun `Single character tokens are scanned`() {
 
         checkScan(
-            " { } ( ) . : , = ",
-            LZeroToken(ELZeroTokenType.LBRACE, "{", 1, 2),
-            LZeroToken(ELZeroTokenType.RBRACE, "}", 1, 4),
-            LZeroToken(ELZeroTokenType.LPAREN, "(", 1, 6),
-            LZeroToken(ELZeroTokenType.RPAREN, ")", 1, 8),
-            LZeroToken(ELZeroTokenType.DOT, ".", 1, 10),
-            LZeroToken(ELZeroTokenType.COLON, ":", 1, 12),
-            LZeroToken(ELZeroTokenType.COMMA, ",", 1, 14),
-            LZeroToken(ELZeroTokenType.EQ, "=", 1, 16)
+            " { } ( ) [ ] . : , = ; - ",
+            LZeroToken(ELZeroTokenType.LEFT_BRACE, "{", 1, 2),
+            LZeroToken(ELZeroTokenType.RIGHT_BRACE, "}", 1, 4),
+            LZeroToken(ELZeroTokenType.LEFT_PARENTHESIS, "(", 1, 6),
+            LZeroToken(ELZeroTokenType.RIGHT_PARENTHESIS, ")", 1, 8),
+            LZeroToken(ELZeroTokenType.LEFT_BRACKET, "[", 1, 10),
+            LZeroToken(ELZeroTokenType.RIGHT_BRACKET, "]", 1, 12),
+            LZeroToken(ELZeroTokenType.DOT, ".", 1, 14),
+            LZeroToken(ELZeroTokenType.COLON, ":", 1, 16),
+            LZeroToken(ELZeroTokenType.COMMA, ",", 1, 18),
+            LZeroToken(ELZeroTokenType.EQ, "=", 1, 20),
+            LZeroToken(ELZeroTokenType.SEMICOLON, ";", 1, 22),
+            LZeroToken(ELZeroTokenType.DASH, "-", 1, 24)
         )
 
     }
@@ -57,13 +61,25 @@ class LZeroScannerSimpleTests
     }
 
     @Test
-    fun `Keywords are scanned`() {
+    fun `Concept keywords are scanned`() {
 
         checkScan(
-            "#abc #pqrs \n\n #xyz123 \n",
-            LZeroToken(ELZeroTokenType.KEYWORD, "#abc", 1, 1),
-            LZeroToken(ELZeroTokenType.KEYWORD, "#pqrs", 1, 6),
-            LZeroToken(ELZeroTokenType.KEYWORD, "#xyz123", 3, 2)
+            "#abc #pqrs \n\n #xyz_123 \n",
+            LZeroToken(ELZeroTokenType.CONCEPT_KEYWORD, "#abc", 1, 1),
+            LZeroToken(ELZeroTokenType.CONCEPT_KEYWORD, "#pqrs", 1, 6),
+            LZeroToken(ELZeroTokenType.CONCEPT_KEYWORD, "#xyz_123", 3, 2)
+        )
+
+    }
+
+    @Test
+    fun `Connector keywords are scanned`() {
+
+        checkScan(
+            "~abc ~pqrs \n\n ~xyz_123 \n",
+            LZeroToken(ELZeroTokenType.CONNECTOR_KEYWORD, "~abc", 1, 1),
+            LZeroToken(ELZeroTokenType.CONNECTOR_KEYWORD, "~pqrs", 1, 6),
+            LZeroToken(ELZeroTokenType.CONNECTOR_KEYWORD, "~xyz_123", 3, 2)
         )
 
     }
@@ -117,12 +133,23 @@ class LZeroScannerSimpleTests
     }
 
     @Test
+    fun `UUID literals are scanned`() {
+
+        checkScan(
+            "%12345678-ABCD-EFab-cdef-901234567890\n%11111111-2222-3333-4444-555555555555",
+            LZeroToken(ELZeroTokenType.UUID, "%12345678-ABCD-EFab-cdef-901234567890", 1, 1),
+            LZeroToken(ELZeroTokenType.UUID, "%11111111-2222-3333-4444-555555555555", 2, 1)
+        )
+
+    }
+
+    @Test
     fun `Documentation lines are scanned`() {
 
         checkScan(
-            "! this is a line of documentation\n\n ! this is another ",
-            LZeroToken(ELZeroTokenType.DOCUMENTATION_LINE, "! this is a line of documentation", 1, 1),
-            LZeroToken(ELZeroTokenType.DOCUMENTATION_LINE, "! this is another ", 3, 2)
+            "/* this is a block of documentation */\n\n /* this is another */",
+            LZeroToken(ELZeroTokenType.DOCUMENTATION, "/* this is a block of documentation */", 1, 1),
+            LZeroToken(ELZeroTokenType.DOCUMENTATION, "/* this is another */", 3, 2)
         )
 
     }

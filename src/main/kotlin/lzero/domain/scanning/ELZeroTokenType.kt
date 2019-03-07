@@ -12,7 +12,8 @@ enum class ELZeroTokenType(
 ) {
 
     /* Keywords */
-    KEYWORD("[keyword]"),
+    CONCEPT_KEYWORD("[concept]"),
+    CONNECTOR_KEYWORD("[connector]"),
 
     /* Identifiers */
     IDENTIFIER("[identifier]"),
@@ -20,26 +21,35 @@ enum class ELZeroTokenType(
     /* Punctuation */
     COLON("':'"),
     COMMA("','"),
+    DASH("'-'"),
     DOT("'.'"),
     EQ("'='"),
-    LBRACE("'{'"),
-    LPAREN("'('"),
-    RBRACE("'}'"),
-    RPAREN("')'"),
+    HASH("'#'"),
+    LEFT_BRACE("'{'"),
+    LEFT_BRACKET("'['"),
+    LEFT_PARENTHESIS("'('"),
+    PERCENT("'%'"),
+    RIGHT_BRACE("'}'"),
+    RIGHT_BRACKET("'}'"),
+    RIGHT_PARENTHESIS("')'"),
+    SEMICOLON("';'"),
+    TILDE("'~'"),
 
     /* Literals */
     CHARACTER_LITERAL("[character literal]"),
     FLOATING_POINT_LITERAL("[floating point literal]"),
     INTEGER_LITERAL("[integer literal]"),
     STRING_LITERAL("[string literal]"),
+    UUID( "[UUID]" ),
 
     /* Documentation */
-    DOCUMENTATION_LINE( "[documentation]" ),
+    DOCUMENTATION( "[documentation]" ),
 
     /** Errors */
-    EMPTY_KEYWORD( "[empty keyword]" ),
     INVALID_CHARACTER( "[invalid character]" ),
+    INVALID_UUID_LITERAL( "[invalid UUID literal]" ),
     UNTERMINATED_CHARACTER_LITERAL( "[unterminated character literal]" ),
+    UNTERMINATED_DOCUMENTATION( "[unterminated documentation]" ),
     UNTERMINATED_QUOTED_IDENTIFIER( "[unterminated quoted identifier]" ),
     UNTERMINATED_STRING_LITERAL( "[unterminated string literal]" ),
 

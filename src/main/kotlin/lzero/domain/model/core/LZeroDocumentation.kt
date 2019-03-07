@@ -8,12 +8,9 @@ package lzero.domain.model.core
 //---------------------------------------------------------------------------------------------------------------------
 
 class LZeroDocumentation(
-    val lines : List<LZeroDocumentationLine>
-) {
-
-    val origin: LZeroOrigin = if ( lines.isNotEmpty() ) lines[0].origin else LZeroNullOrigin()
-
-}
+    val origin: LZeroOrigin,
+    val text : String
+)
 
 //---------------------------------------------------------------------------------------------------------------------
 

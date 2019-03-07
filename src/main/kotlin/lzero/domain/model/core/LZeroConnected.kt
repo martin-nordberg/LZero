@@ -7,9 +7,8 @@ package lzero.domain.model.core
 
 //---------------------------------------------------------------------------------------------------------------------
 
-class LZeroDocumentationLine(
-    val origin: LZeroOrigin,
-    val text : String
+abstract class LZeroConnected(
+    val origin: LZeroOrigin
 )
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -1,12 +1,10 @@
 //
-// (C) Copyright 2018 Martin E. Nordberg III
+// (C) Copyright 2018-2019 Martin E. Nordberg III
 // Apache 2.0 License
 //
 
 package lzero.domain.scanning
 
-import lzero.domain.scanning.ELZeroTokenType
-import lzero.domain.scanning.LZeroToken
 import org.junit.jupiter.api.Test
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -19,12 +17,12 @@ class LZeroScannerErrorTests
     fun `Invalid characters are scanned`() {
 
         checkScan(
-            " #key id %% ! doc ",
-            LZeroToken( ELZeroTokenType.KEYWORD, "#key", 1,2),
+            " #key id ^^ /* doc */ ",
+            LZeroToken( ELZeroTokenType.CONCEPT_KEYWORD, "#key", 1,2),
             LZeroToken( ELZeroTokenType.IDENTIFIER, "id", 1,7),
-            LZeroToken( ELZeroTokenType.INVALID_CHARACTER, "%", 1,10 ),
-            LZeroToken( ELZeroTokenType.INVALID_CHARACTER, "%", 1,11 ),
-            LZeroToken( ELZeroTokenType.DOCUMENTATION_LINE, "! doc ", 1, 13)
+            LZeroToken( ELZeroTokenType.INVALID_CHARACTER, "^", 1,10 ),
+            LZeroToken( ELZeroTokenType.INVALID_CHARACTER, "^", 1,11 ),
+            LZeroToken( ELZeroTokenType.DOCUMENTATION, "/* doc */", 1, 13)
         )
 
     }
@@ -34,7 +32,7 @@ class LZeroScannerErrorTests
 
         checkScan(
             " #key \"first \n\"second ",
-            LZeroToken( ELZeroTokenType.KEYWORD, "#key", 1,2),
+            LZeroToken( ELZeroTokenType.CONCEPT_KEYWORD, "#key", 1,2),
             LZeroToken( ELZeroTokenType.UNTERMINATED_STRING_LITERAL, "\"first ", 1,7),
             LZeroToken( ELZeroTokenType.UNTERMINATED_STRING_LITERAL, "\"second ", 2, 1)
         )
@@ -42,14 +40,16 @@ class LZeroScannerErrorTests
     }
 
     @Test
-    fun `Empty keywords are scanned`() {
+    fun `Empty concept keywords are scanned`() {
 
         checkScan(
-            "#key #\n# #ok",
-            LZeroToken( ELZeroTokenType.KEYWORD, "#key", 1,1),
-            LZeroToken( ELZeroTokenType.EMPTY_KEYWORD, "#", 1, 6),
-            LZeroToken( ELZeroTokenType.EMPTY_KEYWORD, "#", 2, 1),
-            LZeroToken( ELZeroTokenType.KEYWORD, "#ok", 2, 3)
+            "#key #2\n#- #ok",
+            LZeroToken( ELZeroTokenType.CONCEPT_KEYWORD, "#key", 1,1),
+            LZeroToken( ELZeroTokenType.HASH, "#", 1, 6),
+            LZeroToken( ELZeroTokenType.INTEGER_LITERAL, "2", 1, 7),
+            LZeroToken( ELZeroTokenType.HASH, "#", 2, 1),
+            LZeroToken( ELZeroTokenType.DASH, "-", 2, 2),
+            LZeroToken( ELZeroTokenType.CONCEPT_KEYWORD, "#ok", 2, 4)
         )
 
     }
@@ -59,9 +59,21 @@ class LZeroScannerErrorTests
 
         checkScan(
             " #key '1\n'2",
-            LZeroToken( ELZeroTokenType.KEYWORD, "#key", 1,2),
+            LZeroToken( ELZeroTokenType.CONCEPT_KEYWORD, "#key", 1,2),
             LZeroToken( ELZeroTokenType.UNTERMINATED_CHARACTER_LITERAL, "'1", 1,7),
             LZeroToken( ELZeroTokenType.UNTERMINATED_CHARACTER_LITERAL, "'2", 2, 1)
+        )
+
+    }
+
+    @Test
+    fun `Invalid UUID literals are scanned`() {
+
+        checkScan(
+            " %1234-1234-1234 %abcW",
+            LZeroToken( ELZeroTokenType.INVALID_UUID_LITERAL, "%1234-1234-1234", 1, 2),
+            LZeroToken( ELZeroTokenType.INVALID_UUID_LITERAL, "%abc", 1, 18),
+            LZeroToken( ELZeroTokenType.IDENTIFIER, "W", 1, 22)
         )
 
     }

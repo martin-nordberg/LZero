@@ -1,7 +1,7 @@
 
 plugins {
     id 'java'
-    id 'org.jetbrains.kotlin.jvm' version '1.3.11'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.21'
 }
 
 group 'org.lzero'
@@ -16,7 +16,7 @@ repositories {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
-    testCompile "org.jetbrains.kotlin:kotlin-test:1.3.11"
+    testCompile "org.jetbrains.kotlin:kotlin-test:1.3.21"
     testCompile "org.junit.jupiter:junit-jupiter-api:5.2.0"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.2.0"

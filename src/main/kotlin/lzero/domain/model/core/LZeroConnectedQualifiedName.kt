@@ -7,10 +7,9 @@ package lzero.domain.model.core
 
 //---------------------------------------------------------------------------------------------------------------------
 
-class LZeroKeyword(
-    val origin: LZeroOrigin,
-    val text : String
-)
+class LZeroConnectedQualifiedName(
+    val qualifiedName : LZeroQualifiedName
+) : LZeroConnected( qualifiedName.origin)
 
 //---------------------------------------------------------------------------------------------------------------------
 

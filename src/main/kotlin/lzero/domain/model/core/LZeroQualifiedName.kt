@@ -7,16 +7,11 @@ package lzero.domain.model.core
 
 //---------------------------------------------------------------------------------------------------------------------
 
-class LZeroElement(
-    val documentation: LZeroDocumentation?,
-    val annotations: LZeroAnnotationList,
-    val concept: LZeroConcept,
-    val qualifiedName: LZeroQualifiedName?,
-    val uuid: LZeroUuid?,
-    val connections: LZeroConnectionList
+class LZeroQualifiedName(
+    val names : List<LZeroName>
 ) {
 
-    val origin: LZeroOrigin = concept.origin
+    val origin: LZeroOrigin = if ( names.isNotEmpty() ) names[0].origin else LZeroNullOrigin()
 
 }
 
