@@ -47,16 +47,6 @@ class LZeroScanner(
             return scanDocumentation()
         }
 
-        // Scan a concept keyword.
-        if (nextChar == '#') {
-            return scanConceptKeyword()
-        }
-
-        // Scan a connector keyword.
-        if (nextChar == '~') {
-            return scanConnectorKeyword()
-        }
-
         // Scan a string literal.
         if (nextChar == '"') {
             return scanStringLiteral()
@@ -143,7 +133,7 @@ class LZeroScanner(
 
         var nextChar = input.lookAhead()
 
-        while(true) {
+        while (true) {
 
             if (nextChar == StringTokenizer.END_OF_INPUT_CHAR) {
                 return input.extractTokenFromMark(ELZeroTokenType.UNTERMINATED_DOCUMENTATION)
@@ -151,7 +141,7 @@ class LZeroScanner(
 
             input.advance()
 
-            if (nextChar == '*' && input.lookAhead() == '/' ) {
+            if (nextChar == '*' && input.lookAhead() == '/') {
                 return input.advanceAndExtractTokenFromMark(ELZeroTokenType.DOCUMENTATION)
             }
 
@@ -210,45 +200,13 @@ class LZeroScanner(
             input.advance()
         }
 
+        val text = input.extractedTokenText()
+
+        if (text == "true" || text == "false") {
+            return input.extractTokenFromMark(ELZeroTokenType.BOOLEAN_LITERAL)
+        }
+
         return input.extractTokenFromMark(ELZeroTokenType.IDENTIFIER)
-
-    }
-
-    /**
-     * Scans a concept keyword after its opening '#' character has been marked and consumed.
-     */
-    private fun scanConceptKeyword(): LZeroToken {
-
-        if (isKeywordStart(input.lookAhead())) {
-            input.advance()
-        } else {
-            return input.extractTokenFromMark(ELZeroTokenType.HASH)
-        }
-
-        while (isKeywordPart(input.lookAhead())) {
-            input.advance()
-        }
-
-        return input.extractTokenFromMark(ELZeroTokenType.CONCEPT_KEYWORD)
-
-    }
-
-    /**
-     * Scans a connector keyword after its opening '~' character has been marked and consumed.
-     */
-    private fun scanConnectorKeyword(): LZeroToken {
-
-        if (isKeywordStart(input.lookAhead())) {
-            input.advance()
-        } else {
-            return input.extractTokenFromMark(ELZeroTokenType.TILDE)
-        }
-
-        while (isKeywordPart(input.lookAhead())) {
-            input.advance()
-        }
-
-        return input.extractTokenFromMark(ELZeroTokenType.CONNECTOR_KEYWORD)
 
     }
 
@@ -383,6 +341,7 @@ class LZeroScanner(
             '-' to ELZeroTokenType.DASH,
             '.' to ELZeroTokenType.DOT,
             '=' to ELZeroTokenType.EQ,
+            '#' to ELZeroTokenType.HASH,
             '{' to ELZeroTokenType.LEFT_BRACE,
             '[' to ELZeroTokenType.LEFT_BRACKET,
             '(' to ELZeroTokenType.LEFT_PARENTHESIS,
@@ -390,6 +349,7 @@ class LZeroScanner(
             ']' to ELZeroTokenType.RIGHT_BRACKET,
             ')' to ELZeroTokenType.RIGHT_PARENTHESIS,
             ';' to ELZeroTokenType.SEMICOLON,
+            '~' to ELZeroTokenType.TILDE,
             StringTokenizer.END_OF_INPUT_CHAR to ELZeroTokenType.END_OF_INPUT
         )
 

@@ -18,7 +18,8 @@ class LZeroScannerErrorTests
 
         checkScan(
             " #key id ^^ /* doc */ ",
-            LZeroToken( ELZeroTokenType.CONCEPT_KEYWORD, "#key", 1,2),
+            LZeroToken( ELZeroTokenType.HASH, "#", 1,2),
+            LZeroToken( ELZeroTokenType.IDENTIFIER, "key", 1,3),
             LZeroToken( ELZeroTokenType.IDENTIFIER, "id", 1,7),
             LZeroToken( ELZeroTokenType.INVALID_CHARACTER, "^", 1,10 ),
             LZeroToken( ELZeroTokenType.INVALID_CHARACTER, "^", 1,11 ),
@@ -32,7 +33,8 @@ class LZeroScannerErrorTests
 
         checkScan(
             " #key \"first \n\"second ",
-            LZeroToken( ELZeroTokenType.CONCEPT_KEYWORD, "#key", 1,2),
+            LZeroToken( ELZeroTokenType.HASH, "#", 1,2),
+            LZeroToken( ELZeroTokenType.IDENTIFIER, "key", 1,3),
             LZeroToken( ELZeroTokenType.UNTERMINATED_STRING_LITERAL, "\"first ", 1,7),
             LZeroToken( ELZeroTokenType.UNTERMINATED_STRING_LITERAL, "\"second ", 2, 1)
         )
@@ -44,12 +46,14 @@ class LZeroScannerErrorTests
 
         checkScan(
             "#key #2\n#- #ok",
-            LZeroToken( ELZeroTokenType.CONCEPT_KEYWORD, "#key", 1,1),
+            LZeroToken( ELZeroTokenType.HASH, "#", 1,1),
+            LZeroToken( ELZeroTokenType.IDENTIFIER, "key", 1,2),
             LZeroToken( ELZeroTokenType.HASH, "#", 1, 6),
             LZeroToken( ELZeroTokenType.INTEGER_LITERAL, "2", 1, 7),
             LZeroToken( ELZeroTokenType.HASH, "#", 2, 1),
             LZeroToken( ELZeroTokenType.DASH, "-", 2, 2),
-            LZeroToken( ELZeroTokenType.CONCEPT_KEYWORD, "#ok", 2, 4)
+            LZeroToken( ELZeroTokenType.HASH, "#", 2, 4),
+            LZeroToken( ELZeroTokenType.IDENTIFIER, "ok", 2, 5)
         )
 
     }
@@ -59,9 +63,20 @@ class LZeroScannerErrorTests
 
         checkScan(
             " #key '1\n'2",
-            LZeroToken( ELZeroTokenType.CONCEPT_KEYWORD, "#key", 1,2),
+            LZeroToken( ELZeroTokenType.HASH, "#", 1,2),
+            LZeroToken( ELZeroTokenType.IDENTIFIER, "key", 1,3),
             LZeroToken( ELZeroTokenType.UNTERMINATED_CHARACTER_LITERAL, "'1", 1,7),
             LZeroToken( ELZeroTokenType.UNTERMINATED_CHARACTER_LITERAL, "'2", 2, 1)
+        )
+
+    }
+
+    @Test
+    fun `Unterminated documentation is scanned`() {
+
+        checkScan(
+            "/* starts but does not end\n",
+            LZeroToken( ELZeroTokenType.UNTERMINATED_DOCUMENTATION, "/* starts but does not end\n", 1, 1)
         )
 
     }

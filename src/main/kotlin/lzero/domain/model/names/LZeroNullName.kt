@@ -3,14 +3,18 @@
 // Apache 2.0 License
 //
 
-package lzero.domain.model.core
+package lzero.domain.model.names
+
+import lzero.domain.model.core.LZeroNullOrigin
 
 //---------------------------------------------------------------------------------------------------------------------
 
-class LZeroName(
-    val origin: LZeroOrigin,
-    val text : String
-)
+object LZeroNullName
+    : LZeroName(LZeroNullOrigin) {
+
+    override val text: String = ""
+
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 

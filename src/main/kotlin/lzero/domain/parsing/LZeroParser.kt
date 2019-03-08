@@ -5,7 +5,25 @@
 
 package lzero.domain.parsing
 
-import lzero.domain.model.core.*
+import lzero.domain.model.annotations.LZeroAnnotation
+import lzero.domain.model.annotations.LZeroAnnotationList
+import lzero.domain.model.connecteds.LZeroConnected
+import lzero.domain.model.connecteds.LZeroConnectedQualifiedName
+import lzero.domain.model.connecteds.LZeroConnectedUuid
+import lzero.domain.model.connections.*
+import lzero.domain.model.core.LZeroFileOrigin
+import lzero.domain.model.documentation.LZeroBlockDocumentation
+import lzero.domain.model.documentation.LZeroDocumentation
+import lzero.domain.model.documentation.LZeroNullDocumentation
+import lzero.domain.model.elements.LZeroConcept
+import lzero.domain.model.elements.LZeroElement
+import lzero.domain.model.names.LZeroName
+import lzero.domain.model.names.LZeroNullName
+import lzero.domain.model.names.LZeroQualifiedName
+import lzero.domain.model.names.LZeroSimpleName
+import lzero.domain.model.uuids.LZeroKnownUuid
+import lzero.domain.model.uuids.LZeroNullUuid
+import lzero.domain.model.uuids.LZeroUuid
 import lzero.domain.scanning.ELZeroTokenType
 import lzero.domain.scanning.LZeroToken
 
@@ -22,34 +40,23 @@ class LZeroParser(
 
     /**
      * element
-     *   : documentation? annotations concept qualifiedName? uuid? ( "(" parameters? ")" )? connections
+     *   : declaration
+     *   : expression
      *   ;
      */
     fun parseElement(): LZeroElement {
 
-        // expecting(ELZeroTokenType.DOCUMENTATION_LINE, ELZeroTokenType.IDENTIFIER, ELZeroTokenType.CONCEPT_KEYWORD)
-
         // documentation?
         val documentation = parseDocumentationOpt()
-
-        // expecting(ELZeroTokenType.IDENTIFIER, ELZeroTokenType.CONCEPT_KEYWORD)
 
         // annotations
         val annotations = parseAnnotations()
 
-        // expecting(ELZeroTokenType.CONCEPT_KEYWORD)
-
         // concept
         val concept = parseConcept()
 
-        // expecting(ELZeroTokenType.IDENTIFIER, ELZeroTokenType.UUID, ELZeroTokenType.LEFT_PARENTHESIS,
-        //           ELZeroTokenType.COLON, ELZeroTokenType.CONNECTOR_KEYWORD, ELZeroTokenType.SEMICOLON)
-
         // qualifiedName?
         val qualifiedName = parseQualifiedNameOpt()
-
-        // expecting(ELZeroTokenType.UUID, ELZeroTokenType.LEFT_PARENTHESIS,
-        //           ELZeroTokenType.COLON, ELZeroTokenType.CONNECTOR_KEYWORD, ELZeroTokenType.SEMICOLON)
 
         // uuid?
         val uuid = parseUuidOpt()
@@ -62,7 +69,14 @@ class LZeroParser(
         val connections = parseConnections()
 
         // Put together the element from its pieces.
-        return LZeroElement(documentation, annotations, concept, qualifiedName, uuid, connections)
+        return LZeroElement(
+            documentation,
+            annotations,
+            concept,
+            qualifiedName,
+            uuid,
+            connections
+        )
     }
 
     ////
@@ -76,11 +90,13 @@ class LZeroParser(
      */
     private fun parseAnnotation(): LZeroAnnotation {
 
-        val annotationName = input.read(ELZeroTokenType.IDENTIFIER)
+        val atToken = input.read(ELZeroTokenType.AT)
+
+        val qualifiedName = parseQualifiedName()
 
         // TODO: arguments
 
-        return LZeroAnnotation(annotationName.origin, annotationName.text)
+        return LZeroAnnotation(atToken.origin, qualifiedName)
 
     }
 
@@ -95,11 +111,12 @@ class LZeroParser(
 
         val annotations = mutableListOf<LZeroAnnotation>()
 
-        while (input.hasLookAhead(ELZeroTokenType.IDENTIFIER)) {
+        while (input.hasLookAhead(ELZeroTokenType.AT)) {
             annotations.add(parseAnnotation())
         }
 
         return LZeroAnnotationList(annotations)
+
     }
 
     /**
@@ -111,9 +128,11 @@ class LZeroParser(
      */
     private fun parseConcept(): LZeroConcept {
 
-        val conceptToken = input.read(ELZeroTokenType.CONCEPT_KEYWORD)
+        val hashToken = input.read(ELZeroTokenType.HASH)
 
-        return LZeroConcept(conceptToken.origin, conceptToken.text)
+        val qualifiedName = parseQualifiedName()
+
+        return LZeroConcept(hashToken.origin, qualifiedName)
 
     }
 
@@ -164,7 +183,7 @@ class LZeroParser(
             connections.add(parseImplicitConnection())
         }
 
-        while (input.hasLookAhead(ELZeroTokenType.CONNECTOR_KEYWORD)) {
+        while (input.hasLookAhead(ELZeroTokenType.TILDE)) {
             connections.add(parseExplicitConnection())
         }
 
@@ -209,13 +228,13 @@ class LZeroParser(
     /**
      * Parses an optional block of documentation.
      */
-    private fun parseDocumentationOpt(): LZeroDocumentation? {
+    private fun parseDocumentationOpt(): LZeroDocumentation {
 
         if ( input.hasLookAhead(ELZeroTokenType.DOCUMENTATION) ) {
             return parseDocumentation()
         }
 
-        return null
+        return LZeroNullDocumentation
 
     }
 
@@ -229,7 +248,7 @@ class LZeroParser(
     private fun parseDocumentation(): LZeroDocumentation {
 
         val token = input.read(ELZeroTokenType.DOCUMENTATION)
-        return LZeroDocumentation(token.origin, token.text)
+        return LZeroBlockDocumentation(token.origin, token.text)
 
     }
 
@@ -242,9 +261,11 @@ class LZeroParser(
      */
     private fun parseExplicitConnection(): LZeroExplicitConnection {
 
-        val keyword = input.read(ELZeroTokenType.CONNECTOR_KEYWORD)
+        val tildeToken = input.read(ELZeroTokenType.TILDE)
 
-        val connector = LZeroConnector(keyword.origin, keyword.text)
+        val qualifiedName = parseQualifiedName()
+
+        val connector = LZeroConnector(tildeToken.origin, qualifiedName)
 
         // TODO: parameters
 
@@ -272,38 +293,43 @@ class LZeroParser(
     /**
      * Parses an optional qualified name.
      */
-    private fun parseQualifiedNameOpt(): LZeroQualifiedName? {
+    private fun parseQualifiedNameOpt(): LZeroName {
 
         if (!input.hasLookAhead(ELZeroTokenType.IDENTIFIER)) {
-            return null
+            return LZeroNullName
         }
 
         return parseQualifiedName()
     }
 
     /**
-     * Parses an optional qualified name.
+     * Parses a qualified name.
      *
      * qualifiedName
      *   : name ( "." name )*
      *   ;
      */
-    private fun parseQualifiedName(): LZeroQualifiedName {
+    private fun parseQualifiedName(): LZeroName {
 
-        val names = mutableListOf<LZeroName>()
+        val names = mutableListOf<LZeroSimpleName>()
 
         while (true) {
 
             val token = input.read(ELZeroTokenType.IDENTIFIER)
-            names.add(LZeroName(token.origin, token.text))
+            names.add(LZeroSimpleName(token.origin, token.text))
 
-            if (!input.hasLookAhead(2, ELZeroTokenType.IDENTIFIER) && input.consumeWhen(ELZeroTokenType.DOT)) {
+            if (!input.hasLookAhead(2, ELZeroTokenType.IDENTIFIER) || !input.consumeWhen(ELZeroTokenType.DOT)) {
                 break
             }
 
         }
 
-        return LZeroQualifiedName(names)
+        if ( names.size > 1 ) {
+            return LZeroQualifiedName(names)
+        }
+
+        return names[0]
+
     }
 
     /**
@@ -313,11 +339,11 @@ class LZeroParser(
      *   : UUID
      *   ;
      */
-    private fun parseUuid(): LZeroUuid {
+    private fun parseUuid(): LZeroKnownUuid {
 
         val uuidToken = input.read(ELZeroTokenType.UUID)
 
-        return LZeroUuid(uuidToken.origin, uuidToken.text)
+        return LZeroKnownUuid(uuidToken.origin, uuidToken.text)
 
     }
 
@@ -328,10 +354,10 @@ class LZeroParser(
      *   : UUID
      *   ;
      */
-    private fun parseUuidOpt(): LZeroUuid? {
+    private fun parseUuidOpt(): LZeroUuid {
 
         if ( !input.hasLookAhead(ELZeroTokenType.UUID) ) {
-            return null
+            return LZeroNullUuid
         }
 
         return parseUuid()

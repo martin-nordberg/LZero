@@ -3,7 +3,10 @@
 // Apache 2.0 License
 //
 
-package lzero.domain.model.core
+package lzero.domain.model.annotations
+
+import lzero.domain.model.core.LZeroNullOrigin
+import lzero.domain.model.core.LZeroOrigin
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -11,7 +14,7 @@ class LZeroAnnotationList(
     val annotations : List<LZeroAnnotation>
 ) {
 
-    val origin: LZeroOrigin = if ( annotations.isNotEmpty() ) annotations[0].origin else LZeroNullOrigin()
+    val origin: LZeroOrigin = if ( annotations.isNotEmpty() ) annotations[0].origin else LZeroNullOrigin
 
 }
 

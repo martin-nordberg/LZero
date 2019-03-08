@@ -3,16 +3,19 @@
 // Apache 2.0 License
 //
 
-package lzero.domain.model.core
+package lzero.domain.model.elements
+
+import lzero.domain.model.core.LZeroOrigin
+import lzero.domain.model.names.LZeroName
 
 //---------------------------------------------------------------------------------------------------------------------
 
-class LZeroQualifiedName(
-    val names : List<LZeroName>
+class LZeroConcept(
+    val origin: LZeroOrigin,
+    val qualifiedName: LZeroName
 ) {
 
-    val origin: LZeroOrigin = if ( names.isNotEmpty() ) names[0].origin else LZeroNullOrigin()
-
+    val text = "#" + qualifiedName.text
 }
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -3,14 +3,15 @@
 // Apache 2.0 License
 //
 
-package lzero.domain.model.core
+package lzero.domain.model.connecteds
+
+import lzero.domain.model.names.LZeroName
 
 //---------------------------------------------------------------------------------------------------------------------
 
-class LZeroExplicitConnection(
-    val connector: LZeroConnector,
-    val connected: LZeroConnected
-) : LZeroConnection(connector.origin)
+class LZeroConnectedQualifiedName(
+    val qualifiedName : LZeroName
+) : LZeroConnected( qualifiedName.origin)
 
 //---------------------------------------------------------------------------------------------------------------------
 

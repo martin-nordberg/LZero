@@ -3,17 +3,18 @@
 // Apache 2.0 License
 //
 
-package lzero.domain.model.core
+package lzero.domain.model.names
 
 //---------------------------------------------------------------------------------------------------------------------
 
-class LZeroConnectionList(
-    val connections : List<LZeroConnection> = listOf()
-) {
+class LZeroQualifiedName(
+    val names : List<LZeroSimpleName>
+) : LZeroName( if ( names.isNotEmpty() ) names[0].origin else throw IllegalArgumentException("") ) {
 
-    val origin: LZeroOrigin = if ( connections.isNotEmpty() ) connections[0].origin else LZeroNullOrigin()
+    override val text = names.joinToString(".") { n -> n.text }
 
 }
+
 
 //---------------------------------------------------------------------------------------------------------------------
 

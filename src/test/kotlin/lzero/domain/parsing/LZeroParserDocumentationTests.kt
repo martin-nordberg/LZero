@@ -29,8 +29,8 @@ class LZeroParserDocumentationTests {
 
         assertNotNull( element.documentation )
         assertEquals( "/* first line of documentation\n" +
-                "   second line of documentation */", element.documentation!!.text )
-        assertEquals( "test.lzero(1,1)", element.documentation!!.origin.toString() )
+                "   second line of documentation */", element.documentation.text )
+        assertEquals( "test.lzero(1,1)", element.documentation.origin.toString() )
 
         assertEquals( "#example", element.concept.text )
         assertEquals( "test.lzero(3,1)", element.origin.toString() )

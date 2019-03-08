@@ -17,7 +17,7 @@ class LZeroScannerSimpleTests
     fun `Single character tokens are scanned`() {
 
         checkScan(
-            " { } ( ) [ ] . : , = ; - ",
+            " { } ( ) [ ] . : , = ; - ~ % ",
             LZeroToken(ELZeroTokenType.LEFT_BRACE, "{", 1, 2),
             LZeroToken(ELZeroTokenType.RIGHT_BRACE, "}", 1, 4),
             LZeroToken(ELZeroTokenType.LEFT_PARENTHESIS, "(", 1, 6),
@@ -29,7 +29,9 @@ class LZeroScannerSimpleTests
             LZeroToken(ELZeroTokenType.COMMA, ",", 1, 18),
             LZeroToken(ELZeroTokenType.EQ, "=", 1, 20),
             LZeroToken(ELZeroTokenType.SEMICOLON, ";", 1, 22),
-            LZeroToken(ELZeroTokenType.DASH, "-", 1, 24)
+            LZeroToken(ELZeroTokenType.DASH, "-", 1, 24),
+            LZeroToken(ELZeroTokenType.TILDE, "~", 1, 26),
+            LZeroToken(ELZeroTokenType.PERCENT, "%", 1, 28)
         )
 
     }
@@ -38,13 +40,15 @@ class LZeroScannerSimpleTests
     fun `Identifiers are scanned`() {
 
         checkScan(
-            " a abc Ab234 _ _something rr_12_pq",
+            " a abc Ab234 _ _something rr_12_pq true false",
             LZeroToken(ELZeroTokenType.IDENTIFIER, "a", 1, 2),
             LZeroToken(ELZeroTokenType.IDENTIFIER, "abc", 1, 4),
             LZeroToken(ELZeroTokenType.IDENTIFIER, "Ab234", 1, 8),
             LZeroToken(ELZeroTokenType.IDENTIFIER, "_", 1, 14),
             LZeroToken(ELZeroTokenType.IDENTIFIER, "_something", 1, 16),
-            LZeroToken(ELZeroTokenType.IDENTIFIER, "rr_12_pq", 1, 27)
+            LZeroToken(ELZeroTokenType.IDENTIFIER, "rr_12_pq", 1, 27),
+            LZeroToken(ELZeroTokenType.BOOLEAN_LITERAL, "true", 1, 36),
+            LZeroToken(ELZeroTokenType.BOOLEAN_LITERAL, "false", 1, 41)
         )
 
     }
@@ -65,9 +69,12 @@ class LZeroScannerSimpleTests
 
         checkScan(
             "#abc #pqrs \n\n #xyz_123 \n",
-            LZeroToken(ELZeroTokenType.CONCEPT_KEYWORD, "#abc", 1, 1),
-            LZeroToken(ELZeroTokenType.CONCEPT_KEYWORD, "#pqrs", 1, 6),
-            LZeroToken(ELZeroTokenType.CONCEPT_KEYWORD, "#xyz_123", 3, 2)
+            LZeroToken(ELZeroTokenType.HASH, "#", 1, 1),
+            LZeroToken(ELZeroTokenType.IDENTIFIER, "abc", 1, 2),
+            LZeroToken(ELZeroTokenType.HASH, "#", 1, 6),
+            LZeroToken(ELZeroTokenType.IDENTIFIER, "pqrs", 1, 7),
+            LZeroToken(ELZeroTokenType.HASH, "#", 3, 2),
+            LZeroToken(ELZeroTokenType.IDENTIFIER, "xyz_123", 3, 3)
         )
 
     }
@@ -77,9 +84,12 @@ class LZeroScannerSimpleTests
 
         checkScan(
             "~abc ~pqrs \n\n ~xyz_123 \n",
-            LZeroToken(ELZeroTokenType.CONNECTOR_KEYWORD, "~abc", 1, 1),
-            LZeroToken(ELZeroTokenType.CONNECTOR_KEYWORD, "~pqrs", 1, 6),
-            LZeroToken(ELZeroTokenType.CONNECTOR_KEYWORD, "~xyz_123", 3, 2)
+            LZeroToken(ELZeroTokenType.TILDE, "~", 1, 1),
+            LZeroToken(ELZeroTokenType.IDENTIFIER, "abc", 1, 2),
+            LZeroToken(ELZeroTokenType.TILDE, "~", 1, 6),
+            LZeroToken(ELZeroTokenType.IDENTIFIER, "pqrs", 1, 7),
+            LZeroToken(ELZeroTokenType.TILDE, "~", 3, 2),
+            LZeroToken(ELZeroTokenType.IDENTIFIER, "xyz_123", 3, 3)
         )
 
     }
@@ -144,12 +154,12 @@ class LZeroScannerSimpleTests
     }
 
     @Test
-    fun `Documentation lines are scanned`() {
+    fun `Documentation blocks are scanned`() {
 
         checkScan(
-            "/* this is a block of documentation */\n\n /* this is another */",
+            "/* this is a block of documentation */\n\n /* this is ** another */",
             LZeroToken(ELZeroTokenType.DOCUMENTATION, "/* this is a block of documentation */", 1, 1),
-            LZeroToken(ELZeroTokenType.DOCUMENTATION, "/* this is another */", 3, 2)
+            LZeroToken(ELZeroTokenType.DOCUMENTATION, "/* this is ** another */", 3, 2)
         )
 
     }

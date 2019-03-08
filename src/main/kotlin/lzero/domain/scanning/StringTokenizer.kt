@@ -91,6 +91,13 @@ class StringTokenizer(
         )
 
     /**
+     * Returns the text of the token that would be extracted by a call to extractTokenFromMark.
+     * @return the text of the potential token to be extracted.
+     */
+    fun extractedTokenText() =
+        input.substring(myMarkedIndex, myLookAheadIndex)
+
+    /**
      * @return the next not-yet-read character from the input string.
      */
     fun lookAhead(): Char =

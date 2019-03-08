@@ -3,14 +3,18 @@
 // Apache 2.0 License
 //
 
-package lzero.domain.model.core
+package lzero.domain.model.uuids
+
+import lzero.domain.model.core.LZeroNullOrigin
 
 //---------------------------------------------------------------------------------------------------------------------
 
-class LZeroContainment(
-    origin: LZeroOrigin,
-    val containedElements: List<LZeroElement>
-) : LZeroConnection(origin)
+object LZeroNullUuid
+    : LZeroUuid( LZeroNullOrigin ) {
+
+    override val text = ""
+
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 

@@ -3,13 +3,16 @@
 // Apache 2.0 License
 //
 
-package lzero.domain.model.core
+package lzero.domain.model.documentation
+
+import lzero.domain.model.core.LZeroOrigin
 
 //---------------------------------------------------------------------------------------------------------------------
 
-class LZeroConnectedUuid(
-    val uuid : LZeroUuid
-) : LZeroConnected( uuid.origin)
+class LZeroBlockDocumentation(
+    origin: LZeroOrigin,
+    override val text : String
+) : LZeroDocumentation(origin)
 
 //---------------------------------------------------------------------------------------------------------------------
 

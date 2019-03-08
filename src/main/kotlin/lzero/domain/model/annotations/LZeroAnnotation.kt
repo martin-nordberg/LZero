@@ -3,13 +3,16 @@
 // Apache 2.0 License
 //
 
-package lzero.domain.model.core
+package lzero.domain.model.annotations
+
+import lzero.domain.model.core.LZeroOrigin
+import lzero.domain.model.names.LZeroName
 
 //---------------------------------------------------------------------------------------------------------------------
 
-class LZeroUuid(
+class LZeroAnnotation(
     val origin: LZeroOrigin,
-    val text : String
+    val qualifiedName : LZeroName
 )
 
 //---------------------------------------------------------------------------------------------------------------------

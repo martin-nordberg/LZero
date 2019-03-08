@@ -11,14 +11,11 @@ enum class ELZeroTokenType(
     val text: String
 ) {
 
-    /* Keywords */
-    CONCEPT_KEYWORD("[concept]"),
-    CONNECTOR_KEYWORD("[connector]"),
-
     /* Identifiers */
     IDENTIFIER("[identifier]"),
 
     /* Punctuation */
+    AT("'@'"),
     COLON("':'"),
     COMMA("','"),
     DASH("'-'"),
@@ -36,6 +33,7 @@ enum class ELZeroTokenType(
     TILDE("'~'"),
 
     /* Literals */
+    BOOLEAN_LITERAL("[boolean literal]"),
     CHARACTER_LITERAL("[character literal]"),
     FLOATING_POINT_LITERAL("[floating point literal]"),
     INTEGER_LITERAL("[integer literal]"),

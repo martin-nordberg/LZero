@@ -11,7 +11,7 @@ sealed class LZeroOrigin
 
 //---------------------------------------------------------------------------------------------------------------------
 
-class LZeroNullOrigin
+object LZeroNullOrigin
     : LZeroOrigin() {
 
     override fun toString() =

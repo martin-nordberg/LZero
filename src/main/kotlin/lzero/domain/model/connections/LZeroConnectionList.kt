@@ -3,20 +3,18 @@
 // Apache 2.0 License
 //
 
-package lzero.domain.model.core
+package lzero.domain.model.connections
+
+import lzero.domain.model.core.LZeroNullOrigin
+import lzero.domain.model.core.LZeroOrigin
 
 //---------------------------------------------------------------------------------------------------------------------
 
-class LZeroElement(
-    val documentation: LZeroDocumentation?,
-    val annotations: LZeroAnnotationList,
-    val concept: LZeroConcept,
-    val qualifiedName: LZeroQualifiedName?,
-    val uuid: LZeroUuid?,
-    val connections: LZeroConnectionList
+class LZeroConnectionList(
+    val connections : List<LZeroConnection> = listOf()
 ) {
 
-    val origin: LZeroOrigin = concept.origin
+    val origin: LZeroOrigin = if ( connections.isNotEmpty() ) connections[0].origin else LZeroNullOrigin
 
 }
 
