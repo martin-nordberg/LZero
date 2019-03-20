@@ -5,6 +5,7 @@
 
 package lzero.domain.scanning
 
+import lzero.domain.scanning.ELZeroTokenType.*
 import java.lang.Character.*
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -34,6 +35,20 @@ class LZeroScanner(
 
         if (ONE_CHARACTER_TOKENS.containsKey(nextChar)) {
             return input.extractTokenFromMark(ONE_CHARACTER_TOKENS.getValue(nextChar))
+        }
+
+        if (nextChar == '<' && input.lookAhead() == '~') {
+            return input.advanceAndExtractTokenFromMark(LEFT_TILDE)
+        }
+
+        if (nextChar == '~') {
+
+            if (input.lookAhead() == '>') {
+                return input.advanceAndExtractTokenFromMark(RIGHT_TILDE)
+            }
+
+            return input.extractTokenFromMark(TILDE)
+
         }
 
         // Scan an identifier.
@@ -73,7 +88,7 @@ class LZeroScanner(
         }
 
         // Error - nothing else it could be.
-        return input.extractTokenFromMark(ELZeroTokenType.INVALID_CHARACTER)
+        return input.extractTokenFromMark(INVALID_CHARACTER)
 
     }
 
@@ -114,14 +129,14 @@ class LZeroScanner(
         while (nextChar != '\'') {
 
             if (nextChar == '\n' || nextChar == StringTokenizer.END_OF_INPUT_CHAR) {
-                return input.extractTokenFromMark(ELZeroTokenType.UNTERMINATED_CHARACTER_LITERAL)
+                return input.extractTokenFromMark(UNTERMINATED_CHARACTER_LITERAL)
             }
 
             nextChar = input.advanceAndLookAhead()
 
         }
 
-        return input.advanceAndExtractTokenFromMark(ELZeroTokenType.CHARACTER_LITERAL)
+        return input.advanceAndExtractTokenFromMark(CHARACTER_LITERAL)
 
     }
 
@@ -136,13 +151,13 @@ class LZeroScanner(
         while (true) {
 
             if (nextChar == StringTokenizer.END_OF_INPUT_CHAR) {
-                return input.extractTokenFromMark(ELZeroTokenType.UNTERMINATED_DOCUMENTATION)
+                return input.extractTokenFromMark(UNTERMINATED_DOCUMENTATION)
             }
 
             input.advance()
 
             if (nextChar == '*' && input.lookAhead() == '/') {
-                return input.advanceAndExtractTokenFromMark(ELZeroTokenType.DOCUMENTATION)
+                return input.advanceAndExtractTokenFromMark(DOCUMENTATION)
             }
 
             nextChar = input.lookAhead()
@@ -187,7 +202,7 @@ class LZeroScanner(
             input.advance()
         }
 
-        return input.extractTokenFromMark(ELZeroTokenType.FLOATING_POINT_LITERAL)
+        return input.extractTokenFromMark(FLOATING_POINT_LITERAL)
 
     }
 
@@ -203,10 +218,10 @@ class LZeroScanner(
         val text = input.extractedTokenText()
 
         if (text == "true" || text == "false") {
-            return input.extractTokenFromMark(ELZeroTokenType.BOOLEAN_LITERAL)
+            return input.extractTokenFromMark(BOOLEAN_LITERAL)
         }
 
-        return input.extractTokenFromMark(ELZeroTokenType.IDENTIFIER)
+        return input.extractTokenFromMark(IDENTIFIER)
 
     }
 
@@ -232,7 +247,7 @@ class LZeroScanner(
             input.advance()
         }
 
-        return input.extractTokenFromMark(ELZeroTokenType.INTEGER_LITERAL)
+        return input.extractTokenFromMark(INTEGER_LITERAL)
 
     }
 
@@ -246,14 +261,14 @@ class LZeroScanner(
         while (nextChar != '`') {
 
             if (nextChar == '\n' || nextChar == StringTokenizer.END_OF_INPUT_CHAR) {
-                return input.extractTokenFromMark(ELZeroTokenType.UNTERMINATED_QUOTED_IDENTIFIER)
+                return input.extractTokenFromMark(UNTERMINATED_QUOTED_IDENTIFIER)
             }
 
             nextChar = input.advanceAndLookAhead()
 
         }
 
-        return input.advanceAndExtractTokenFromMark(ELZeroTokenType.IDENTIFIER)
+        return input.advanceAndExtractTokenFromMark(IDENTIFIER)
 
     }
 
@@ -267,14 +282,14 @@ class LZeroScanner(
         while (nextChar != '"') {
 
             if (nextChar == '\n' || nextChar == StringTokenizer.END_OF_INPUT_CHAR) {
-                return input.extractTokenFromMark(ELZeroTokenType.UNTERMINATED_STRING_LITERAL)
+                return input.extractTokenFromMark(UNTERMINATED_STRING_LITERAL)
             }
 
             nextChar = input.advanceAndLookAhead()
 
         }
 
-        return input.advanceAndExtractTokenFromMark(ELZeroTokenType.STRING_LITERAL)
+        return input.advanceAndExtractTokenFromMark(STRING_LITERAL)
 
     }
 
@@ -306,7 +321,7 @@ class LZeroScanner(
         }
 
         if (!readUuidChars(1)) {
-            return input.extractTokenFromMark(ELZeroTokenType.PERCENT)
+            return input.extractTokenFromMark(PERCENT)
         }
 
         val scanned = readUuidChars(7) && readDash() &&
@@ -316,14 +331,14 @@ class LZeroScanner(
                 readUuidChars(12)
 
         if (scanned) {
-            return input.extractTokenFromMark(ELZeroTokenType.UUID)
+            return input.extractTokenFromMark(UUID)
         }
 
         while (readUuidChars(1) || readDash()) {
             // keep consuming
         }
 
-        return input.extractTokenFromMark(ELZeroTokenType.INVALID_UUID_LITERAL)
+        return input.extractTokenFromMark(INVALID_UUID_LITERAL)
 
     }
 
@@ -336,21 +351,20 @@ class LZeroScanner(
 
         /** Characters that serve as tokens of length one. */
         private val ONE_CHARACTER_TOKENS = mapOf(
-            ':' to ELZeroTokenType.COLON,
-            ',' to ELZeroTokenType.COMMA,
-            '-' to ELZeroTokenType.DASH,
-            '.' to ELZeroTokenType.DOT,
-            '=' to ELZeroTokenType.EQ,
-            '#' to ELZeroTokenType.HASH,
-            '{' to ELZeroTokenType.LEFT_BRACE,
-            '[' to ELZeroTokenType.LEFT_BRACKET,
-            '(' to ELZeroTokenType.LEFT_PARENTHESIS,
-            '}' to ELZeroTokenType.RIGHT_BRACE,
-            ']' to ELZeroTokenType.RIGHT_BRACKET,
-            ')' to ELZeroTokenType.RIGHT_PARENTHESIS,
-            ';' to ELZeroTokenType.SEMICOLON,
-            '~' to ELZeroTokenType.TILDE,
-            StringTokenizer.END_OF_INPUT_CHAR to ELZeroTokenType.END_OF_INPUT
+            ':' to COLON,
+            ',' to COMMA,
+            '-' to DASH,
+            '.' to DOT,
+            '=' to EQ,
+            '#' to HASH,
+            '{' to LEFT_BRACE,
+            '[' to LEFT_BRACKET,
+            '(' to LEFT_PARENTHESIS,
+            '}' to RIGHT_BRACE,
+            ']' to RIGHT_BRACKET,
+            ')' to RIGHT_PARENTHESIS,
+            ';' to SEMICOLON,
+            StringTokenizer.END_OF_INPUT_CHAR to END_OF_INPUT
         )
 
     }

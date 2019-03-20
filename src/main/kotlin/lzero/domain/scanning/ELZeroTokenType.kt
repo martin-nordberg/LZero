@@ -25,10 +25,12 @@ enum class ELZeroTokenType(
     LEFT_BRACE("'{'"),
     LEFT_BRACKET("'['"),
     LEFT_PARENTHESIS("'('"),
+    LEFT_TILDE("'<~'"),
     PERCENT("'%'"),
     RIGHT_BRACE("'}'"),
     RIGHT_BRACKET("'}'"),
     RIGHT_PARENTHESIS("')'"),
+    RIGHT_TILDE("'~>'"),
     SEMICOLON("';'"),
     TILDE("'~'"),
 
@@ -38,21 +40,21 @@ enum class ELZeroTokenType(
     FLOATING_POINT_LITERAL("[floating point literal]"),
     INTEGER_LITERAL("[integer literal]"),
     STRING_LITERAL("[string literal]"),
-    UUID( "[UUID]" ),
+    UUID("[UUID]"),
 
     /* Documentation */
-    DOCUMENTATION( "[documentation]" ),
+    DOCUMENTATION("[documentation]"),
 
     /** Errors */
-    INVALID_CHARACTER( "[invalid character]" ),
-    INVALID_UUID_LITERAL( "[invalid UUID literal]" ),
-    UNTERMINATED_CHARACTER_LITERAL( "[unterminated character literal]" ),
-    UNTERMINATED_DOCUMENTATION( "[unterminated documentation]" ),
-    UNTERMINATED_QUOTED_IDENTIFIER( "[unterminated quoted identifier]" ),
-    UNTERMINATED_STRING_LITERAL( "[unterminated string literal]" ),
+    INVALID_CHARACTER("[invalid character]"),
+    INVALID_UUID_LITERAL("[invalid UUID literal]"),
+    UNTERMINATED_CHARACTER_LITERAL("[unterminated character literal]"),
+    UNTERMINATED_DOCUMENTATION("[unterminated documentation]"),
+    UNTERMINATED_QUOTED_IDENTIFIER("[unterminated quoted identifier]"),
+    UNTERMINATED_STRING_LITERAL("[unterminated string literal]"),
 
     /** End of input. */
-    END_OF_INPUT( "[end of input]");
+    END_OF_INPUT("[end of input]");
 
     ////
 

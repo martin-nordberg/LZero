@@ -3,15 +3,15 @@
 // Apache 2.0 License
 //
 
-package lzero.domain.model.connections
+package lzero.domain.model.connectedelements
 
-import lzero.domain.model.core.LZeroOrigin
+import lzero.domain.model.uuids.LZeroKnownUuid
 
 //---------------------------------------------------------------------------------------------------------------------
 
-abstract class LZeroValueAssignment(
-    origin: LZeroOrigin
-) : LZeroConnection(origin)
+class LZeroConnectedUuid(
+    val uuid: LZeroKnownUuid
+) : LZeroConnectedElement(uuid.origin)
 
 //---------------------------------------------------------------------------------------------------------------------
 

@@ -3,15 +3,18 @@
 // Apache 2.0 License
 //
 
-package lzero.domain.model.connecteds
+package lzero.domain.model.arguments
 
-import lzero.domain.model.names.LZeroName
+import lzero.domain.model.core.LZeroOrigin
 
 //---------------------------------------------------------------------------------------------------------------------
 
-class LZeroConnectedQualifiedName(
-    val qualifiedName : LZeroName
-) : LZeroConnected( qualifiedName.origin)
+class LZeroSpecifiedArgumentList(
+    origin: LZeroOrigin,
+    val arguments: List<LZeroArgument>
+) : LZeroArgumentList(origin) {
+
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 

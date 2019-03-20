@@ -3,15 +3,18 @@
 // Apache 2.0 License
 //
 
-package lzero.domain.model.connecteds
+package lzero.domain.model.expressions.literals
 
 import lzero.domain.model.core.LZeroOrigin
+import lzero.domain.model.documentation.LZeroDocumentation
 
 //---------------------------------------------------------------------------------------------------------------------
 
-abstract class LZeroConnected(
-    val origin: LZeroOrigin
-)
+class LZeroFloatingPointLiteral(
+    origin: LZeroOrigin,
+    documentation: LZeroDocumentation,
+    override val text: String
+) : LZeroLiteralExpression(origin, documentation)
 
 //---------------------------------------------------------------------------------------------------------------------
 

@@ -5,6 +5,7 @@
 
 package lzero.domain.model.annotations
 
+import lzero.domain.model.arguments.LZeroArgumentList
 import lzero.domain.model.core.LZeroOrigin
 import lzero.domain.model.names.LZeroName
 
@@ -12,7 +13,8 @@ import lzero.domain.model.names.LZeroName
 
 class LZeroAnnotation(
     val origin: LZeroOrigin,
-    val qualifiedName : LZeroName
+    val qualifiedName: LZeroName,
+    val argumentList: LZeroArgumentList
 )
 
 //---------------------------------------------------------------------------------------------------------------------

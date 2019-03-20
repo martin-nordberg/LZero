@@ -3,15 +3,18 @@
 // Apache 2.0 License
 //
 
-package lzero.domain.model.connections
+package lzero.domain.model.expressions.literals
 
 import lzero.domain.model.core.LZeroOrigin
+import lzero.domain.model.documentation.LZeroDocumentation
+import lzero.domain.model.expressions.LZeroExpression
 
 //---------------------------------------------------------------------------------------------------------------------
 
-abstract class LZeroValueAssignment(
-    origin: LZeroOrigin
-) : LZeroConnection(origin)
+abstract class LZeroLiteralExpression(
+    origin: LZeroOrigin,
+    documentation: LZeroDocumentation
+) : LZeroExpression(origin, documentation)
 
 //---------------------------------------------------------------------------------------------------------------------
 

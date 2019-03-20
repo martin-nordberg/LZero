@@ -3,15 +3,14 @@
 // Apache 2.0 License
 //
 
-package lzero.domain.model.connections
+package lzero.domain.model.arguments
 
-import lzero.domain.model.core.LZeroOrigin
+import lzero.domain.model.core.LZeroNullOrigin
 
 //---------------------------------------------------------------------------------------------------------------------
 
-abstract class LZeroValueAssignment(
-    origin: LZeroOrigin
-) : LZeroConnection(origin)
+object LZeroNullArgumentList
+    : LZeroArgumentList(LZeroNullOrigin)
 
 //---------------------------------------------------------------------------------------------------------------------
 

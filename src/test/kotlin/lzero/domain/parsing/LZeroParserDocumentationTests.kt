@@ -5,6 +5,7 @@
 
 package lzero.domain.parsing
 
+import lzero.domain.model.elements.LZeroDeclaration
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -27,14 +28,18 @@ class LZeroParserDocumentationTests {
 
         val element = parser.parseElement()
 
-        assertNotNull( element.documentation )
-        assertEquals( "/* first line of documentation\n" +
-                "   second line of documentation */", element.documentation.text )
-        assertEquals( "test.lzero(1,1)", element.documentation.origin.toString() )
+        assertNotNull(element.documentation)
+        assertEquals(
+            "/* first line of documentation\n" +
+                    "   second line of documentation */", element.documentation.text
+        )
+        assertEquals("test.lzero(1,1)", element.documentation.origin.toString())
 
-        assertEquals( "#example", element.concept.text )
-        assertEquals( "test.lzero(3,1)", element.origin.toString() )
-        assertEquals( "test.lzero(3,1)", element.concept.origin.toString() )
+        element as LZeroDeclaration
+
+        assertEquals("#example", element.concept.text)
+        assertEquals("test.lzero(3,1)", element.origin.toString())
+        assertEquals("test.lzero(3,1)", element.concept.origin.toString())
 
     }
 

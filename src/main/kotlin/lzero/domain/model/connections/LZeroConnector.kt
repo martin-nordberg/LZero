@@ -12,7 +12,8 @@ import lzero.domain.model.names.LZeroName
 
 class LZeroConnector(
     val origin: LZeroOrigin,
-    val qualifiedName: LZeroName
+    val qualifiedName: LZeroName,
+    val direction: ELZeroConnectionDirection
 )
 
 //---------------------------------------------------------------------------------------------------------------------

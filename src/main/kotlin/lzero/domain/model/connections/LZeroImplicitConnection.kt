@@ -5,14 +5,14 @@
 
 package lzero.domain.model.connections
 
-import lzero.domain.model.connecteds.LZeroConnected
+import lzero.domain.model.connectedelements.LZeroConnectedElement
 import lzero.domain.model.core.LZeroOrigin
 
 //---------------------------------------------------------------------------------------------------------------------
 
 class LZeroImplicitConnection(
     origin: LZeroOrigin,
-    val connected: LZeroConnected
+    val connectedElement: LZeroConnectedElement
 ) : LZeroConnection(origin)
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -23,8 +23,8 @@ internal class LZeroExpectedTokenBufferImpl(
     override fun expected(description: String): Nothing {
         val token = lookAhead(1)
 
-        val msg = if ( token == null ) "Expected $description."
-                  else "Expected $description at (${token.line},${token.column}); found '${token.text}'"
+        val msg = if (token == null) "Expected $description."
+        else "Expected $description at (${token.line},${token.column}); found '${token.text}'"
 
         throw IllegalArgumentException(msg)
     }
@@ -49,6 +49,11 @@ internal class LZeroExpectedTokenBufferImpl(
         val tokenText = tokenTypes.joinToString(", ") { t -> t.text }
         expected("$description - one of { $tokenText }")
 
+    }
+
+    override fun hasLookAheadOnNewLine(): Boolean {
+        val lastToken = lookAhead(0)
+        return lastToken != null && hasLookAhead() && lastToken.line < lookAhead(1)!!.line
     }
 
     override fun read(tokenType: ELZeroTokenType): LZeroToken {

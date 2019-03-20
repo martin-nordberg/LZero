@@ -5,16 +5,15 @@
 
 package lzero.domain.model.connections
 
-import lzero.domain.model.connectedelements.LZeroConnectedElement
-import lzero.domain.model.parameters.LZeroParameterList
+import lzero.domain.model.core.LZeroOrigin
+import lzero.domain.model.expressions.literals.LZeroLiteralExpression
 
 //---------------------------------------------------------------------------------------------------------------------
 
-class LZeroExplicitConnection(
-    val connector: LZeroConnector,
-    val parameters: LZeroParameterList,
-    val connectedElement: LZeroConnectedElement
-) : LZeroConnection(connector.origin)
+class LZeroLiteralValueAssignment(
+    origin: LZeroOrigin,
+    val expression: LZeroLiteralExpression
+) : LZeroValueAssignment(origin)
 
 //---------------------------------------------------------------------------------------------------------------------
 

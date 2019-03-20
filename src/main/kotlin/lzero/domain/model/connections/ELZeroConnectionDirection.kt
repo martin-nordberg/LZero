@@ -5,16 +5,13 @@
 
 package lzero.domain.model.connections
 
-import lzero.domain.model.connectedelements.LZeroConnectedElement
-import lzero.domain.model.parameters.LZeroParameterList
-
 //---------------------------------------------------------------------------------------------------------------------
 
-class LZeroExplicitConnection(
-    val connector: LZeroConnector,
-    val parameters: LZeroParameterList,
-    val connectedElement: LZeroConnectedElement
-) : LZeroConnection(connector.origin)
+enum class ELZeroConnectionDirection {
+    UNDIRECTED,
+    LEFT,
+    RIGHT
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 

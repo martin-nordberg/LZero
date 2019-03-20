@@ -33,6 +33,11 @@ internal interface LZeroExpectedTokenBuffer
     fun expected(description: String, vararg tokenTypes: ELZeroTokenType): Nothing
 
     /**
+     * Determines whether the look ahead token occurs on a new line from the last read token.
+     */
+    fun hasLookAheadOnNewLine(): Boolean
+
+    /**
      * Reads one token expected to be of the given [tokenType].
      */
     fun read(tokenType: ELZeroTokenType): LZeroToken
