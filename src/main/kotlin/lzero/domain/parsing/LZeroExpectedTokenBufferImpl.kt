@@ -53,7 +53,8 @@ internal class LZeroExpectedTokenBufferImpl(
 
     override fun hasLookAheadOnNewLine(): Boolean {
         val lastToken = lookAhead(0)
-        return lastToken != null && hasLookAhead() && lastToken.line < lookAhead(1)!!.line
+        return (lastToken != null && hasLookAhead() && lastToken.line < lookAhead(1)!!.line) ||
+                hasLookAhead(ELZeroTokenType.END_OF_INPUT)
     }
 
     override fun read(tokenType: ELZeroTokenType): LZeroToken {
@@ -69,9 +70,11 @@ internal class LZeroExpectedTokenBufferImpl(
     override fun readOneOf(vararg tokenTypes: ELZeroTokenType): LZeroToken {
 
         for (tokenType in tokenTypes) {
+
             if (hasLookAhead(tokenType)) {
                 return read()
             }
+
         }
 
         expected(*tokenTypes)

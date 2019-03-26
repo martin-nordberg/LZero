@@ -26,8 +26,20 @@ class LZeroReferenceExpression(
     documentation
 ) {
 
-    override val text: String =
-        "TODO"
+    override val text: String
+        get() {
+            var result = documentation.text
+
+            result += if (qualifiedName is LZeroNullName) uuid.text
+            else qualifiedName.text
+
+            result += arguments.text
+
+            result += valueAssignment.text
+
+            return result
+        }
+
 }
 
 //---------------------------------------------------------------------------------------------------------------------

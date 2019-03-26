@@ -15,7 +15,8 @@ class LZeroContainment(
     val containedElements: List<LZeroElement>
 ) : LZeroConnection(origin) {
 
-    override val text = "TBD"
+    override val text =
+        containedElements.joinToString("\n", " {\n", "\n}") { e -> e.text }
 
 }
 

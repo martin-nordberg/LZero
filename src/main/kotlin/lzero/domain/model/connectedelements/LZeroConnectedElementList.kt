@@ -16,7 +16,7 @@ class LZeroConnectedElementList(
 ) : LZeroConnectedElement(origin) {
 
     override val text =
-        connectedElements.joinToString(", ", "{ ", " }") { e -> e.text }
+        connectedElements.joinToString(", ", "[ ", " ]") { e -> e.text }
 }
 
 //---------------------------------------------------------------------------------------------------------------------

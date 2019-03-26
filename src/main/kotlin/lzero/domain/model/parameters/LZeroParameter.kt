@@ -5,7 +5,7 @@
 
 package lzero.domain.model.parameters
 
-import lzero.domain.model.connections.LZeroConnectionList
+import lzero.domain.model.connections.LZeroImplicitConnection
 import lzero.domain.model.core.LZeroOrigin
 import lzero.domain.model.names.LZeroSimpleName
 
@@ -14,10 +14,10 @@ import lzero.domain.model.names.LZeroSimpleName
 class LZeroParameter(
     val origin: LZeroOrigin,
     val name: LZeroSimpleName,
-    val connectionList: LZeroConnectionList
+    val connection: LZeroImplicitConnection
 ) {
 
-    val text = name.text + connectionList.text
+    val text = name.text + connection.text
 
 }
 

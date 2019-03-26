@@ -53,10 +53,7 @@ class LZeroDeclaration(
 
             result += parameters.text
 
-            if (connections.connections.isEmpty()) {
-                result += ";"
-            }
-            // TODO: connections
+            result += connections.text
 
             return result
 

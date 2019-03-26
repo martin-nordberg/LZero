@@ -146,9 +146,16 @@ class LZeroParser(
 
         val arguments = mutableListOf<LZeroArgument>()
 
-        while (!input.consumeWhen(RIGHT_PARENTHESIS)) {
+        if (!input.consumeWhen(RIGHT_PARENTHESIS)) {
+
             arguments.add(parseArgument())
-            input.consumeWhen(COMMA)
+
+            while (input.consumeWhen(COMMA)) {
+                arguments.add(parseArgument())
+            }
+
+            input.read(RIGHT_PARENTHESIS)
+
         }
 
         return LZeroSpecifiedArgumentList(leftParenToken.origin, arguments)
@@ -231,9 +238,14 @@ class LZeroParser(
 
         val elements = mutableListOf<LZeroElement>()
 
-        while (!input.consumeWhen(RIGHT_BRACKET)) {
+        elements.add(parseElement())
+
+        while (input.consumeWhen(COMMA)) {
             elements.add(parseElement())
         }
+
+        input.read(RIGHT_BRACKET)
+
 
         return LZeroConnectedElementList(leftBracketToken.origin, elements)
 
@@ -372,9 +384,9 @@ class LZeroParser(
      * Parses an explicit connection (one where the connector is spelled out).
      *
      * explicitConnection
-     *   : "~" qualifiedName parameterList? "~" connectedElement
-     *   | "~" qualifiedName parameterList? "~>" connectedElement
-     *   | "<~" qualifiedName parameterList? "~" connectedElement
+     *   : "~" qualifiedName argumentList? "~" connectedElement
+     *   | "~" qualifiedName argumentList? "~>" connectedElement
+     *   | "<~" qualifiedName argumentList? "~" connectedElement
      *   ;
      */
     private fun parseExplicitConnection(): LZeroExplicitConnection {
@@ -388,7 +400,7 @@ class LZeroParser(
 
         val qualifiedName = parseQualifiedName()
 
-        val parameters = parseParameterListOpt()
+        val arguments = parseArgumentListOpt()
 
         val tildeToken2 = if (input.hasLookAhead(TILDE)) {
             input.read(TILDE)
@@ -397,19 +409,15 @@ class LZeroParser(
             input.read(RIGHT_TILDE)
         }
 
-        val direction = if (tildeToken1.type == LEFT_TILDE) {
-            ELZeroConnectionDirection.LEFT
-        }
-        else if (tildeToken2.type == RIGHT_TILDE) {
-            ELZeroConnectionDirection.RIGHT
-        }
-        else {
-            ELZeroConnectionDirection.UNDIRECTED
+        val direction = when {
+            tildeToken1.type == LEFT_TILDE  -> ELZeroConnectionDirection.LEFT
+            tildeToken2.type == RIGHT_TILDE -> ELZeroConnectionDirection.RIGHT
+            else                            -> ELZeroConnectionDirection.UNDIRECTED
         }
 
-        val connector = LZeroConnector(qualifiedName.origin, qualifiedName, direction)
+        val connector = LZeroConnector(qualifiedName.origin, qualifiedName, arguments, direction)
 
-        return LZeroExplicitConnection(connector, parameters, parseConnectedElement())
+        return LZeroExplicitConnection(connector, parseConnectedElement())
 
     }
 
@@ -451,11 +459,24 @@ class LZeroParser(
      *   : ":" connectedElement
      *   ;
      */
-    private fun parseImplicitConnection(): LZeroImplicitConnection {
+    private fun parseImplicitConnection(): LZeroSpecifiedImplicitConnection {
 
         val colonToken = input.read(COLON)
 
-        return LZeroImplicitConnection(colonToken.origin, parseConnectedElement())
+        return LZeroSpecifiedImplicitConnection(colonToken.origin, parseConnectedElement())
+
+    }
+
+    /**
+     * Parses an optional implicit connection.
+     */
+    private fun parseImplicitConnectionOpt(): LZeroImplicitConnection {
+
+        if (input.hasLookAhead(COLON)) {
+            return parseImplicitConnection()
+        }
+
+        return LZeroNullImplicitConnection
 
     }
 
@@ -525,13 +546,9 @@ class LZeroParser(
 
         val simpleName = parseSimpleName()
 
-        val connections = mutableListOf<LZeroConnection>()
+        val connection = parseImplicitConnectionOpt()
 
-        if (input.hasLookAhead(COLON)) {
-            connections.add(parseImplicitConnection())
-        }
-
-        return LZeroParameter(simpleName.origin, simpleName, LZeroConnectionList(connections))
+        return LZeroParameter(simpleName.origin, simpleName, connection)
 
     }
 
@@ -623,7 +640,7 @@ class LZeroParser(
      * Parses a reference expression.
      *
      * referenceExpression
-     *   : documentation? (qualifiedName | uuid) parameterList? valueAssignment?
+     *   : documentation? (qualifiedName | uuid) argumentList? valueAssignment?
      *   ;
      */
     private fun parseReferenceExpression(): LZeroReferenceExpression {

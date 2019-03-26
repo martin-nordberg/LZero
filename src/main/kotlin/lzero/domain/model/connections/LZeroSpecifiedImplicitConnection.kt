@@ -5,21 +5,17 @@
 
 package lzero.domain.model.connections
 
-import lzero.domain.model.core.LZeroNullOrigin
+import lzero.domain.model.connectedelements.LZeroConnectedElement
 import lzero.domain.model.core.LZeroOrigin
 
 //---------------------------------------------------------------------------------------------------------------------
 
-class LZeroConnectionList(
-    val connections: List<LZeroConnection> = listOf()
-) {
+class LZeroSpecifiedImplicitConnection(
+    origin: LZeroOrigin,
+    val connectedElement: LZeroConnectedElement
+) : LZeroImplicitConnection(origin) {
 
-    val origin: LZeroOrigin =
-        if (connections.isNotEmpty()) connections[0].origin
-        else LZeroNullOrigin
-
-    val text =
-        connections.joinToString("") { c -> c.text }
+    override val text = ": " + connectedElement.text
 
 }
 
