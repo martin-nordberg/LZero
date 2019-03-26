@@ -18,7 +18,7 @@ enum class ELZeroTokenType(
     AT("'@'"),
     COLON("':'"),
     COMMA("','"),
-    DASH("'-'"),
+    DASH("'-'"), // TODO: keep?
     DOT("'.'"),
     EQ("'='"),
     HASH("'#'"),
@@ -26,7 +26,7 @@ enum class ELZeroTokenType(
     LEFT_BRACKET("'['"),
     LEFT_PARENTHESIS("'('"),
     LEFT_TILDE("'<~'"),
-    PERCENT("'%'"),
+    PERCENT("'%'"),  // TODO: keep?
     RIGHT_BRACE("'}'"),
     RIGHT_BRACKET("'}'"),
     RIGHT_PARENTHESIS("')'"),
@@ -41,6 +41,11 @@ enum class ELZeroTokenType(
     INTEGER_LITERAL("[integer literal]"),
     STRING_LITERAL("[string literal]"),
     UUID("[UUID]"),
+    // TODO: date $...$
+    // TODO: date/time $...T...$
+    // TODO: regex /.../ig...
+    // TODO: time $T...$
+    // TODO: URL [...]  (or |...| ?)
 
     /* Documentation */
     DOCUMENTATION("[documentation]"),

@@ -107,19 +107,6 @@ class LZeroScanner(
         isJavaIdentifierStart(character) && character != StringTokenizer.END_OF_INPUT_CHAR
 
     /**
-     * @return true if the given [character] can be part of a keyword.
-     */
-    private fun isKeywordPart(character: Char) =
-        isJavaIdentifierPart(character) && character != StringTokenizer.END_OF_INPUT_CHAR
-
-    /**
-     * @return true if the given [character] can be the first character of a keyword (after its opening '#' or '~'
-     *         character).
-     */
-    private fun isKeywordStart(character: Char) =
-        isJavaIdentifierStart(character) && character != StringTokenizer.END_OF_INPUT_CHAR
-
-    /**
      * Scans a character literal token after its opening "'" character has been marked and consumed in the tokenizer.
      */
     private fun scanCharacterLiteral(): LZeroToken {
@@ -311,14 +298,20 @@ class LZeroScanner(
             return true
         }
 
-        fun readDash(): Boolean {
+        fun readChar(ch: Char): Boolean {
             val nextChar = input.lookAhead()
-            if (nextChar == '-') {
+            if (nextChar == ch) {
                 input.advance()
                 return true
             }
             return false
         }
+
+        fun readDash() =
+            readChar('-')
+
+        fun readPercent() =
+            readChar('%')
 
         if (!readUuidChars(1)) {
             return input.extractTokenFromMark(PERCENT)
@@ -328,7 +321,7 @@ class LZeroScanner(
                 readUuidChars(4) && readDash() &&
                 readUuidChars(4) && readDash() &&
                 readUuidChars(4) && readDash() &&
-                readUuidChars(12)
+                readUuidChars(12) && readPercent()
 
         if (scanned) {
             return input.extractTokenFromMark(UUID)
@@ -337,6 +330,8 @@ class LZeroScanner(
         while (readUuidChars(1) || readDash()) {
             // keep consuming
         }
+
+        readPercent()
 
         return input.extractTokenFromMark(INVALID_UUID_LITERAL)
 
@@ -351,6 +346,7 @@ class LZeroScanner(
 
         /** Characters that serve as tokens of length one. */
         private val ONE_CHARACTER_TOKENS = mapOf(
+            '@' to AT,
             ':' to COLON,
             ',' to COMMA,
             '-' to DASH,

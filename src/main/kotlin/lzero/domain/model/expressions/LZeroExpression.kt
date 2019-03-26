@@ -14,11 +14,7 @@ import lzero.domain.model.elements.LZeroElement
 abstract class LZeroExpression(
     origin: LZeroOrigin,
     documentation: LZeroDocumentation
-) : LZeroElement(origin, documentation) {
-
-    abstract val text: String
-
-}
+) : LZeroElement(origin, documentation)
 
 //---------------------------------------------------------------------------------------------------------------------
 

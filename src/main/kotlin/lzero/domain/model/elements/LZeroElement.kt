@@ -13,7 +13,11 @@ import lzero.domain.model.documentation.LZeroDocumentation
 abstract class LZeroElement(
     val origin: LZeroOrigin,
     val documentation: LZeroDocumentation
-)
+) {
+
+    abstract val text: String
+
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 

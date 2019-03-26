@@ -8,10 +8,11 @@ package lzero.domain.model.names
 //---------------------------------------------------------------------------------------------------------------------
 
 class LZeroQualifiedName(
-    val names : List<LZeroSimpleName>
-) : LZeroName( if ( names.isNotEmpty() ) names[0].origin else throw IllegalArgumentException("") ) {
+    val names: List<LZeroSimpleName>
+) : LZeroName(if (names.isNotEmpty()) names[0].origin else throw IllegalArgumentException("")) {
 
-    override val text = names.joinToString(".") { n -> n.text }
+    override val text =
+        names.joinToString(".") { n -> n.text }
 
 }
 

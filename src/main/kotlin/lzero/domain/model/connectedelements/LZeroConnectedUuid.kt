@@ -11,7 +11,12 @@ import lzero.domain.model.uuids.LZeroKnownUuid
 
 class LZeroConnectedUuid(
     val uuid: LZeroKnownUuid
-) : LZeroConnectedElement(uuid.origin)
+) : LZeroConnectedElement(uuid.origin) {
+
+    override val text =
+        uuid.text
+
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 

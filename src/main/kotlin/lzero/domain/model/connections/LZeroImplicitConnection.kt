@@ -13,7 +13,11 @@ import lzero.domain.model.core.LZeroOrigin
 class LZeroImplicitConnection(
     origin: LZeroOrigin,
     val connectedElement: LZeroConnectedElement
-) : LZeroConnection(origin)
+) : LZeroConnection(origin) {
+
+    override val text = ": " + connectedElement.text
+
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 

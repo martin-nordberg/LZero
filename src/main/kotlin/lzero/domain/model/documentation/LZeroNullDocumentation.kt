@@ -12,7 +12,8 @@ import lzero.domain.model.core.LZeroNullOrigin
 object LZeroNullDocumentation
     : LZeroDocumentation(LZeroNullOrigin) {
 
-    override val text = ""
+    override val text =
+        ""
 
 }
 

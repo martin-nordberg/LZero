@@ -5,15 +5,19 @@
 
 package lzero.domain.model.connections
 
-import lzero.domain.model.elements.LZeroElement
 import lzero.domain.model.core.LZeroOrigin
+import lzero.domain.model.elements.LZeroElement
 
 //---------------------------------------------------------------------------------------------------------------------
 
 class LZeroContainment(
     origin: LZeroOrigin,
     val containedElements: List<LZeroElement>
-) : LZeroConnection(origin)
+) : LZeroConnection(origin) {
+
+    override val text = "TBD"
+
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 

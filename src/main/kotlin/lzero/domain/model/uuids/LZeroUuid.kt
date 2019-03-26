@@ -13,7 +13,8 @@ abstract class LZeroUuid(
     val origin: LZeroOrigin
 ) {
 
-    abstract val text : String
+    abstract val text: String
+
 }
 
 //---------------------------------------------------------------------------------------------------------------------

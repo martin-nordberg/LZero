@@ -148,6 +148,7 @@ class LZeroParser(
 
         while (!input.consumeWhen(RIGHT_PARENTHESIS)) {
             arguments.add(parseArgument())
+            input.consumeWhen(COMMA)
         }
 
         return LZeroSpecifiedArgumentList(leftParenToken.origin, arguments)
@@ -529,11 +530,8 @@ class LZeroParser(
         if (input.hasLookAhead(COLON)) {
             connections.add(parseImplicitConnection())
         }
-        else {
-            parseSemicolonOrNewLine()
-        }
 
-        return LZeroParameter(simpleName.origin, simpleName)
+        return LZeroParameter(simpleName.origin, simpleName, LZeroConnectionList(connections))
 
     }
 
@@ -548,13 +546,21 @@ class LZeroParser(
 
         val leftParenToken = input.read(LEFT_PARENTHESIS)
 
-        val arguments = mutableListOf<LZeroParameter>()
+        val parameters = mutableListOf<LZeroParameter>()
 
-        while (!input.consumeWhen(RIGHT_PARENTHESIS)) {
-            arguments.add(parseParameter())
+        if (!input.consumeWhen(RIGHT_PARENTHESIS)) {
+
+            parameters.add(parseParameter())
+
+            while (input.consumeWhen(COMMA)) {
+                parameters.add(parseParameter())
+            }
+
+            input.read(RIGHT_PARENTHESIS)
+
         }
 
-        return LZeroSpecifiedParameterList(leftParenToken.origin, arguments)
+        return LZeroSpecifiedParameterList(leftParenToken.origin, parameters)
 
     }
 

@@ -14,6 +14,9 @@ class LZeroSpecifiedParameterList(
     val parameters: List<LZeroParameter>
 ) : LZeroParameterList(origin) {
 
+    override val text =
+        parameters.joinToString(", ", "(", ")") { p -> p.text }
+
 }
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -10,7 +10,11 @@ import lzero.domain.model.core.LZeroNullOrigin
 //---------------------------------------------------------------------------------------------------------------------
 
 object LZeroNullValueAssignment :
-    LZeroValueAssignment(LZeroNullOrigin)
+    LZeroValueAssignment(LZeroNullOrigin) {
+
+    override val text = ""
+
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 

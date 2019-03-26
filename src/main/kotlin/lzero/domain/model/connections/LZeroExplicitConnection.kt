@@ -14,7 +14,11 @@ class LZeroExplicitConnection(
     val connector: LZeroConnector,
     val parameters: LZeroParameterList,
     val connectedElement: LZeroConnectedElement
-) : LZeroConnection(connector.origin)
+) : LZeroConnection(connector.origin) {
+
+    override val text = "TBD"
+
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 

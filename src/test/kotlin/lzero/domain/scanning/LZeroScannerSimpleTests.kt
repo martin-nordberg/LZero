@@ -17,7 +17,7 @@ class LZeroScannerSimpleTests
     fun `Single character tokens are scanned`() {
 
         checkScan(
-            " { } ( ) [ ] . : , = ; - ~ % ",
+            " { } ( ) [ ] . : , = ; - ~ % @ ",
             LZeroToken(ELZeroTokenType.LEFT_BRACE, "{", 1, 2),
             LZeroToken(ELZeroTokenType.RIGHT_BRACE, "}", 1, 4),
             LZeroToken(ELZeroTokenType.LEFT_PARENTHESIS, "(", 1, 6),
@@ -31,7 +31,8 @@ class LZeroScannerSimpleTests
             LZeroToken(ELZeroTokenType.SEMICOLON, ";", 1, 22),
             LZeroToken(ELZeroTokenType.DASH, "-", 1, 24),
             LZeroToken(ELZeroTokenType.TILDE, "~", 1, 26),
-            LZeroToken(ELZeroTokenType.PERCENT, "%", 1, 28)
+            LZeroToken(ELZeroTokenType.PERCENT, "%", 1, 28),
+            LZeroToken(ELZeroTokenType.AT, "@", 1, 30)
         )
 
     }
@@ -146,9 +147,9 @@ class LZeroScannerSimpleTests
     fun `UUID literals are scanned`() {
 
         checkScan(
-            "%12345678-ABCD-EFab-cdef-901234567890\n%11111111-2222-3333-4444-555555555555",
-            LZeroToken(ELZeroTokenType.UUID, "%12345678-ABCD-EFab-cdef-901234567890", 1, 1),
-            LZeroToken(ELZeroTokenType.UUID, "%11111111-2222-3333-4444-555555555555", 2, 1)
+            "%12345678-ABCD-EFab-cdef-901234567890%\n%11111111-2222-3333-4444-555555555555%",
+            LZeroToken(ELZeroTokenType.UUID, "%12345678-ABCD-EFab-cdef-901234567890%", 1, 1),
+            LZeroToken(ELZeroTokenType.UUID, "%11111111-2222-3333-4444-555555555555%", 2, 1)
         )
 
     }

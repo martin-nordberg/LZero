@@ -11,7 +11,12 @@ import lzero.domain.model.names.LZeroName
 
 class LZeroConnectedQualifiedName(
     val qualifiedName: LZeroName
-) : LZeroConnectedElement(qualifiedName.origin)
+) : LZeroConnectedElement(qualifiedName.origin) {
+
+    override val text =
+        qualifiedName.text
+
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 

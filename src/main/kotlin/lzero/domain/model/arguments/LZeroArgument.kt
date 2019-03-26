@@ -14,7 +14,24 @@ class LZeroArgument(
     val origin: LZeroOrigin,
     val name: LZeroArgumentName,
     val expression: LZeroExpression
-)
+) {
+
+    val text: String
+        get() {
+
+            var result = ""
+
+            if (name is LZeroSpecifiedArgumentName) {
+                result += name.text
+                result += " = "
+            }
+
+            result += expression.text
+
+            return result
+
+        }
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 

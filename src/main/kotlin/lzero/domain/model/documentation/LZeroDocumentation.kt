@@ -12,7 +12,9 @@ import lzero.domain.model.core.LZeroOrigin
 abstract class LZeroDocumentation(
     val origin: LZeroOrigin
 ) {
-    abstract val text : String
+
+    abstract val text: String
+
 }
 
 //---------------------------------------------------------------------------------------------------------------------

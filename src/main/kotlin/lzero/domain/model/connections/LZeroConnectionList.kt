@@ -11,10 +11,14 @@ import lzero.domain.model.core.LZeroOrigin
 //---------------------------------------------------------------------------------------------------------------------
 
 class LZeroConnectionList(
-    val connections : List<LZeroConnection> = listOf()
+    val connections: List<LZeroConnection> = listOf()
 ) {
 
-    val origin: LZeroOrigin = if ( connections.isNotEmpty() ) connections[0].origin else LZeroNullOrigin
+    val origin: LZeroOrigin =
+        if (connections.isNotEmpty()) connections[0].origin else LZeroNullOrigin
+
+    val text =
+        connections.joinToString { c -> c.text }
 
 }
 

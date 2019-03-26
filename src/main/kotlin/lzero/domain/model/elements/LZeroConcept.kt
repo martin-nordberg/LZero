@@ -15,7 +15,9 @@ class LZeroConcept(
     val qualifiedName: LZeroName
 ) {
 
-    val text = "#" + qualifiedName.text
+    val text =
+        "#" + qualifiedName.text
+
 }
 
 //---------------------------------------------------------------------------------------------------------------------

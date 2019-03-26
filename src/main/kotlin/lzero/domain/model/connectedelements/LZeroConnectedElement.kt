@@ -11,7 +11,11 @@ import lzero.domain.model.core.LZeroOrigin
 
 abstract class LZeroConnectedElement(
     val origin: LZeroOrigin
-)
+) {
+
+    abstract val text: String
+
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 

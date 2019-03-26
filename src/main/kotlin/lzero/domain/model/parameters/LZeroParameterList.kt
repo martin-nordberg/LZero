@@ -11,7 +11,11 @@ import lzero.domain.model.core.LZeroOrigin
 
 abstract class LZeroParameterList(
     val origin: LZeroOrigin
-)
+) {
+
+    abstract val text: String
+
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 

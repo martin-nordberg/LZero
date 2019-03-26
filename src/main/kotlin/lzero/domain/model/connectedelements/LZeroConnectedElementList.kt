@@ -13,7 +13,11 @@ import lzero.domain.model.elements.LZeroElement
 class LZeroConnectedElementList(
     origin: LZeroOrigin,
     val connectedElements: List<LZeroElement>
-) : LZeroConnectedElement(origin)
+) : LZeroConnectedElement(origin) {
+
+    override val text =
+        connectedElements.joinToString(", ", "{ ", " }") { e -> e.text }
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 

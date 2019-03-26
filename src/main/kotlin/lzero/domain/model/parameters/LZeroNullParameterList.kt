@@ -10,7 +10,11 @@ import lzero.domain.model.core.LZeroNullOrigin
 //---------------------------------------------------------------------------------------------------------------------
 
 object LZeroNullParameterList
-    : LZeroParameterList(LZeroNullOrigin)
+    : LZeroParameterList(LZeroNullOrigin) {
+
+    override val text = ""
+
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 

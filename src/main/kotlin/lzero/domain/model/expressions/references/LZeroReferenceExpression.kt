@@ -26,7 +26,8 @@ class LZeroReferenceExpression(
     documentation
 ) {
 
-    override val text: String = "TODO"
+    override val text: String =
+        "TODO"
 }
 
 //---------------------------------------------------------------------------------------------------------------------

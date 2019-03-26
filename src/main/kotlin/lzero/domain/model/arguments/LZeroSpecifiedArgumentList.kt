@@ -14,6 +14,9 @@ class LZeroSpecifiedArgumentList(
     val arguments: List<LZeroArgument>
 ) : LZeroArgumentList(origin) {
 
+    override val text =
+        arguments.joinToString(", ", "(", ")") { a -> a.text }
+
 }
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -14,8 +14,13 @@ import lzero.domain.model.names.LZeroName
 class LZeroAnnotation(
     val origin: LZeroOrigin,
     val qualifiedName: LZeroName,
-    val argumentList: LZeroArgumentList
-)
+    val arguments: LZeroArgumentList
+) {
+
+    val text =
+        "@" + qualifiedName.text + arguments.text
+
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 

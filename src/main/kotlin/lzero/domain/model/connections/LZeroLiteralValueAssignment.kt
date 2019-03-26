@@ -13,7 +13,11 @@ import lzero.domain.model.expressions.literals.LZeroLiteralExpression
 class LZeroLiteralValueAssignment(
     origin: LZeroOrigin,
     val expression: LZeroLiteralExpression
-) : LZeroValueAssignment(origin)
+) : LZeroValueAssignment(origin) {
+
+    override val text = " = " + expression.text
+
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 
