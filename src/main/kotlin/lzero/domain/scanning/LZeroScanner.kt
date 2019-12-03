@@ -6,6 +6,7 @@
 package lzero.domain.scanning
 
 import lzero.domain.scanning.ELZeroTokenType.*
+
 import java.lang.Character.*
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -33,14 +34,17 @@ class LZeroScanner(
         // Consume the one character after marking the start of a token.
         input.markAndAdvance()
 
+        // Scan a single-character token.
         if (ONE_CHARACTER_TOKENS.containsKey(nextChar)) {
             return input.extractTokenFromMark(ONE_CHARACTER_TOKENS.getValue(nextChar))
         }
 
+        // Scan "<~".
         if (nextChar == '<' && input.lookAhead() == '~') {
             return input.advanceAndExtractTokenFromMark(LEFT_TILDE)
         }
 
+        // Scan "~>" or "~".
         if (nextChar == '~') {
 
             if (input.lookAhead() == '>') {

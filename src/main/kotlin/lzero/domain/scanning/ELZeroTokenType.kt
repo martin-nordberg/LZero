@@ -43,9 +43,11 @@ enum class ELZeroTokenType(
     UUID("[UUID]"),
     // TODO: date $...$
     // TODO: date/time $...T...$
+    // TODO?: rational number 123r45
     // TODO: regex /.../ig...
     // TODO: time $T...$
-    // TODO: URL [...]  (or |...| ?)
+    // TODO: unsigned 123u
+    // TODO: URL |...|
 
     /* Documentation */
     DOCUMENTATION("[documentation]"),

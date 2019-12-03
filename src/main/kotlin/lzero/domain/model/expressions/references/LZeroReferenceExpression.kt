@@ -5,6 +5,7 @@
 
 package lzero.domain.model.expressions.references
 
+import lzero.domain.generating.CodeWriter
 import lzero.domain.model.arguments.LZeroArgumentList
 import lzero.domain.model.connections.LZeroValueAssignment
 import lzero.domain.model.documentation.LZeroDocumentation
@@ -26,19 +27,15 @@ class LZeroReferenceExpression(
     documentation
 ) {
 
-    override val text: String
-        get() {
-            var result = documentation.text
+    override fun writeCode(output: CodeWriter) {
+        output.write(documentation.text)
 
-            result += if (qualifiedName is LZeroNullName) uuid.text
-            else qualifiedName.text
+        output.write(if (qualifiedName is LZeroNullName) uuid.text else qualifiedName.text)
 
-            result += arguments.text
+        arguments.writeCode(output)
 
-            result += valueAssignment.text
-
-            return result
-        }
+        valueAssignment.writeCode(output)
+    }
 
 }
 

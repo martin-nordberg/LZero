@@ -5,6 +5,7 @@
 
 package lzero.domain.model.connectedelements
 
+import lzero.domain.generating.CodeWriter
 import lzero.domain.model.core.LZeroOrigin
 import lzero.domain.model.elements.LZeroElement
 
@@ -15,8 +16,11 @@ class LZeroConnectedElementList(
     val connectedElements: List<LZeroElement>
 ) : LZeroConnectedElement(origin) {
 
-    override val text =
-        connectedElements.joinToString(", ", "[ ", " ]") { e -> e.text }
+    override fun writeCode(output: CodeWriter) =
+        output.writeSqBracketCommaBlock( connectedElements) { e ->
+            e.writeCode(this)
+        }
+
 }
 
 //---------------------------------------------------------------------------------------------------------------------

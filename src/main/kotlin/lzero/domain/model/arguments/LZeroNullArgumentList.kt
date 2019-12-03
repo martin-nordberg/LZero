@@ -5,6 +5,7 @@
 
 package lzero.domain.model.arguments
 
+import lzero.domain.generating.CodeWriter
 import lzero.domain.model.core.LZeroNullOrigin
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -12,8 +13,7 @@ import lzero.domain.model.core.LZeroNullOrigin
 object LZeroNullArgumentList
     : LZeroArgumentList(LZeroNullOrigin) {
 
-    override val text =
-        ""
+    override fun writeCode(output: CodeWriter) {}
 
 }
 

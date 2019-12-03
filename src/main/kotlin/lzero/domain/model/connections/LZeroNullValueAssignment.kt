@@ -5,6 +5,7 @@
 
 package lzero.domain.model.connections
 
+import lzero.domain.generating.CodeWriter
 import lzero.domain.model.core.LZeroNullOrigin
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -12,7 +13,7 @@ import lzero.domain.model.core.LZeroNullOrigin
 object LZeroNullValueAssignment :
     LZeroValueAssignment(LZeroNullOrigin) {
 
-    override val text = ""
+    override fun writeCode(output: CodeWriter) {}
 
 }
 

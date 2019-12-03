@@ -5,6 +5,7 @@
 
 package lzero.domain.model.connections
 
+import lzero.domain.generating.CodeWriter
 import lzero.domain.model.connectedelements.LZeroConnectedElement
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -14,8 +15,10 @@ class LZeroExplicitConnection(
     val connectedElement: LZeroConnectedElement
 ) : LZeroConnection(connector.origin) {
 
-    override val text =
-        connector.text + connectedElement.text
+    override fun writeCode(output: CodeWriter) {
+        connector.writeCode(output)
+        connectedElement.writeCode(output)
+    }
 
 }
 

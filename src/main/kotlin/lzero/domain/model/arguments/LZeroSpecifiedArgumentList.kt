@@ -5,6 +5,7 @@
 
 package lzero.domain.model.arguments
 
+import lzero.domain.generating.CodeWriter
 import lzero.domain.model.core.LZeroOrigin
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -14,8 +15,10 @@ class LZeroSpecifiedArgumentList(
     val arguments: List<LZeroArgument>
 ) : LZeroArgumentList(origin) {
 
-    override val text =
-        arguments.joinToString(", ", "(", ")") { a -> a.text }
+    override fun writeCode(output: CodeWriter) =
+        output.writeParenCommaBlock(arguments) { a ->
+            a.writeCode(this)
+        }
 
 }
 

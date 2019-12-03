@@ -51,7 +51,7 @@ class LZeroParser(
     /**
      * element
      *   : declaration
-     *   : expression
+     *   | expression
      *   ;
      */
     fun parseElement(): LZeroElement {
@@ -88,7 +88,7 @@ class LZeroParser(
         // qualifiedName
         val qualifiedName = parseQualifiedName()
 
-        // parameterList?
+        // argumentList?
         val argumentList = parseArgumentListOpt()
 
         return LZeroAnnotation(atToken.origin, qualifiedName, argumentList)
@@ -106,6 +106,7 @@ class LZeroParser(
 
         val annotations = mutableListOf<LZeroAnnotation>()
 
+        // annotation*
         while (input.hasLookAhead(AT)) {
             annotations.add(parseAnnotation())
         }
@@ -125,8 +126,10 @@ class LZeroParser(
 
         val origin = input.lookAhead(1)!!.origin
 
+        // argumentName?
         val argumentName = parseArgumentNameOpt()
 
+        // expression
         val expression = parseExpression()
 
         return LZeroArgument(origin, argumentName, expression)
@@ -142,18 +145,22 @@ class LZeroParser(
      */
     private fun parseArgumentList(): LZeroArgumentList {
 
+        // "("
         val leftParenToken = input.read(LEFT_PARENTHESIS)
 
         val arguments = mutableListOf<LZeroArgument>()
 
         if (!input.consumeWhen(RIGHT_PARENTHESIS)) {
 
+            // argument
             arguments.add(parseArgument())
 
+            // ( "," argument )*
             while (input.consumeWhen(COMMA)) {
                 arguments.add(parseArgument())
             }
 
+            // ")"
             input.read(RIGHT_PARENTHESIS)
 
         }
@@ -186,8 +193,10 @@ class LZeroParser(
 
         if (input.hasLookAhead(2, EQ) && input.hasLookAhead(IDENTIFIER)) {
 
+            // simpleName
             val name = parseSimpleName()
 
+            // "="
             input.read(EQ)
 
             return LZeroSpecifiedArgumentName(name.origin, name.text)
@@ -207,8 +216,10 @@ class LZeroParser(
      */
     private fun parseConcept(): LZeroConcept {
 
+        // "#"
         val hashToken = input.read(HASH)
 
+        // qualifiedName
         val qualifiedName = parseQualifiedName()
 
         return LZeroConcept(hashToken.origin, qualifiedName)
@@ -221,31 +232,36 @@ class LZeroParser(
      * connectedElement
      *   : qualifiedName
      *   | uuid
-     *   | "[" element* "]"
+     *   | "[" element ("," element)* "]"
      *   ;
      */
     private fun parseConnectedElement(): LZeroConnectedElement {
 
+        // qualifiedName
         if (input.hasLookAhead(IDENTIFIER)) {
             return LZeroConnectedQualifiedName(parseQualifiedName())
         }
 
+        // uuid
         if (input.hasLookAhead(UUID)) {
             return LZeroConnectedUuid(parseUuid())
         }
 
+        // "["
         val leftBracketToken = input.read(LEFT_BRACKET)
 
         val elements = mutableListOf<LZeroElement>()
 
+        // element
         elements.add(parseElement())
 
+        // ("," element)*
         while (input.consumeWhen(COMMA)) {
             elements.add(parseElement())
         }
 
+        // "]"
         input.read(RIGHT_BRACKET)
-
 
         return LZeroConnectedElementList(leftBracketToken.origin, elements)
 
@@ -255,11 +271,10 @@ class LZeroParser(
      * Parses a list of connections (that can be empty).
      *
      * connectionList
-     *   : implicitConnection+ explicitConnection* (containment | valueAssignment)?
-     *   | explicitConnection+ (containment | valueAssignment)?
-     *   | containment
-     *   | valueAssignment
-     *   | semicolonOrNewLine
+     *   : implicitConnection+ explicitConnection* (containment | valueAssignment)? semicolonOrNewLine
+     *   | explicitConnection+ (containment | valueAssignment)? semicolonOrNewLine
+     *   | containment semicolonOrNewLine
+     *   | valueAssignment semicolonOrNewLine
      *   ;
      */
     private fun parseConnectionList(): LZeroConnectionList {
@@ -281,7 +296,7 @@ class LZeroParser(
             connections.add(parseValueAssignment())
         }
 
-        if (connections.isEmpty()) {
+        if (!input.hasLookAhead(RIGHT_BRACE)) {
             parseSemicolonOrNewLine()
         }
 
@@ -298,10 +313,12 @@ class LZeroParser(
      */
     private fun parseContainment(): LZeroContainment {
 
+        // "{"
         val leftBrace = input.read(LEFT_BRACE)
 
         val containedElements = mutableListOf<LZeroElement>()
 
+        // element* "}"
         while (!input.hasLookAhead(RIGHT_BRACE)) {
             containedElements.add(parseElement())
         }
@@ -375,7 +392,9 @@ class LZeroParser(
      */
     private fun parseDocumentation(): LZeroBlockDocumentation {
 
+        // DOCUMENTATION
         val token = input.read(DOCUMENTATION)
+
         return LZeroBlockDocumentation(token.origin, token.text)
 
     }
@@ -392,20 +411,26 @@ class LZeroParser(
     private fun parseExplicitConnection(): LZeroExplicitConnection {
 
         val tildeToken1 = if (input.hasLookAhead(TILDE)) {
+            // "~"
             input.read(TILDE)
         }
         else {
+            // "<~"
             input.read(LEFT_TILDE)
         }
 
+        // qualifiedName
         val qualifiedName = parseQualifiedName()
 
+        // argumentList?
         val arguments = parseArgumentListOpt()
 
         val tildeToken2 = if (input.hasLookAhead(TILDE)) {
+            // "~"
             input.read(TILDE)
         }
         else {
+            // "~>"
             input.read(RIGHT_TILDE)
         }
 
@@ -417,7 +442,10 @@ class LZeroParser(
 
         val connector = LZeroConnector(qualifiedName.origin, qualifiedName, arguments, direction)
 
-        return LZeroExplicitConnection(connector, parseConnectedElement())
+        // connectedElement
+        val connectedElement = parseConnectedElement()
+
+        return LZeroExplicitConnection(connector, connectedElement)
 
     }
 
@@ -461,9 +489,13 @@ class LZeroParser(
      */
     private fun parseImplicitConnection(): LZeroSpecifiedImplicitConnection {
 
+        // ":"
         val colonToken = input.read(COLON)
 
-        return LZeroSpecifiedImplicitConnection(colonToken.origin, parseConnectedElement())
+        // connectedElement
+        val connectedElement = parseConnectedElement()
+
+        return LZeroSpecifiedImplicitConnection(colonToken.origin, connectedElement)
 
     }
 
@@ -544,11 +576,13 @@ class LZeroParser(
      */
     private fun parseParameter(): LZeroParameter {
 
+        // simpleName
         val simpleName = parseSimpleName()
 
-        val connection = parseImplicitConnectionOpt()
+        // implicitConnection
+        val implicitConnection = parseImplicitConnectionOpt()
 
-        return LZeroParameter(simpleName.origin, simpleName, connection)
+        return LZeroParameter(simpleName.origin, simpleName, implicitConnection)
 
     }
 
@@ -561,18 +595,23 @@ class LZeroParser(
      */
     private fun parseParameterList(): LZeroParameterList {
 
+        // "("
         val leftParenToken = input.read(LEFT_PARENTHESIS)
 
         val parameters = mutableListOf<LZeroParameter>()
 
+
         if (!input.consumeWhen(RIGHT_PARENTHESIS)) {
 
+            // parameter
             parameters.add(parseParameter())
 
+            // ("," parameter)*
             while (input.consumeWhen(COMMA)) {
                 parameters.add(parseParameter())
             }
 
+            // ")"
             input.read(RIGHT_PARENTHESIS)
 
         }
@@ -595,18 +634,6 @@ class LZeroParser(
     }
 
     /**
-     * Parses an optional qualified name.
-     */
-    private fun parseQualifiedNameOpt(): LZeroName {
-
-        if (!input.hasLookAhead(IDENTIFIER)) {
-            return LZeroNullName
-        }
-
-        return parseQualifiedName()
-    }
-
-    /**
      * Parses a qualified name.
      *
      * qualifiedName
@@ -619,9 +646,11 @@ class LZeroParser(
 
         while (true) {
 
-            val token = input.read(IDENTIFIER)
-            names.add(LZeroSimpleName(token.origin, token.text))
+            // simpleName
+            val simpleName = parseSimpleName()
+            names.add(simpleName)
 
+            // "."?
             if (!input.hasLookAhead(2, IDENTIFIER) || !input.consumeWhen(DOT)) {
                 break
             }
@@ -637,6 +666,18 @@ class LZeroParser(
     }
 
     /**
+     * Parses an optional qualified name.
+     */
+    private fun parseQualifiedNameOpt(): LZeroName {
+
+        if (!input.hasLookAhead(IDENTIFIER)) {
+            return LZeroNullName
+        }
+
+        return parseQualifiedName()
+    }
+
+    /**
      * Parses a reference expression.
      *
      * referenceExpression
@@ -645,14 +686,19 @@ class LZeroParser(
      */
     private fun parseReferenceExpression(): LZeroReferenceExpression {
 
+        // documentation
         val documentation = parseDocumentationOpt()
 
+        // qualifiedName
         val qualifiedName = parseQualifiedNameOpt()
 
+        // uuid?
         val uuid = if (qualifiedName is LZeroNullName) parseUuid() else LZeroNullUuid
 
+        // argumentList?
         val argumentList = parseArgumentListOpt()
 
+        // valueAssignment?
         val valueAssignment = parseValueAssignmentOpt()
 
         return LZeroReferenceExpression(documentation, qualifiedName, uuid, argumentList, valueAssignment)
@@ -669,11 +715,14 @@ class LZeroParser(
      */
     private fun parseSemicolonOrNewLine() {
 
+        // next token on new line
         if (input.hasLookAheadOnNewLine()) {
             return
         }
 
+        // ";"
         input.read(SEMICOLON)
+
     }
 
     /**
@@ -685,6 +734,7 @@ class LZeroParser(
      */
     private fun parseSimpleName(): LZeroSimpleName {
 
+        // IDENTIFIER
         val nameToken = input.read(IDENTIFIER)
 
         return LZeroSimpleName(nameToken.origin, nameToken.text)
@@ -700,6 +750,7 @@ class LZeroParser(
      */
     private fun parseUuid(): LZeroKnownUuid {
 
+        // UUID
         val uuidToken = input.read(UUID)
 
         return LZeroKnownUuid(uuidToken.origin, uuidToken.text)
@@ -728,8 +779,10 @@ class LZeroParser(
      */
     private fun parseValueAssignment(): LZeroValueAssignment {
 
+        // "="
         val equals = input.read(EQ)
 
+        // literalExpression
         // TODO: parse an arbitrary expression or just a literal?
         val expression = parseLiteralExpression()
 

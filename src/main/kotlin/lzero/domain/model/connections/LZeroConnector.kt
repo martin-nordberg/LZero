@@ -5,6 +5,7 @@
 
 package lzero.domain.model.connections
 
+import lzero.domain.generating.CodeWriter
 import lzero.domain.model.arguments.LZeroArgumentList
 import lzero.domain.model.core.LZeroOrigin
 import lzero.domain.model.names.LZeroName
@@ -18,25 +19,35 @@ class LZeroConnector(
     val direction: ELZeroConnectionDirection
 ) {
 
-    val text: String
+    val code: String
         get() {
-            var result = when (direction) {
-                ELZeroConnectionDirection.LEFT -> " <~"
-                else                           -> " ~"
+            val output = CodeWriter()
+            writeCode(output)
+            return output.toString()
+        }
+
+    fun writeCode(output: CodeWriter) {
+
+        output.write(
+            when (direction) {
+                ELZeroConnectionDirection.LEFT -> "<~"
+                else                           -> "~"
             }
+        )
 
-            result += qualifiedName.text
+        output.write(qualifiedName.text)
 
-            result += arguments.text
+        arguments.writeCode(output)
 
-            result += when (direction) {
+        output.write(
+            when (direction) {
                 ELZeroConnectionDirection.RIGHT -> "~> "
                 else                            -> "~ "
             }
+        )
 
-            return result
+    }
 
-        }
 }
 
 //---------------------------------------------------------------------------------------------------------------------

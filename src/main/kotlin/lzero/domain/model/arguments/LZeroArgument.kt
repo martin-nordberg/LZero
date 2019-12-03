@@ -5,6 +5,7 @@
 
 package lzero.domain.model.arguments
 
+import lzero.domain.generating.CodeWriter
 import lzero.domain.model.core.LZeroOrigin
 import lzero.domain.model.expressions.LZeroExpression
 
@@ -16,21 +17,23 @@ class LZeroArgument(
     val expression: LZeroExpression
 ) {
 
-    val text: String
+    val code: String
         get() {
-
-            var result = ""
-
-            if (name is LZeroSpecifiedArgumentName) {
-                result += name.text
-                result += " = "
-            }
-
-            result += expression.text
-
-            return result
-
+            val output = CodeWriter()
+            writeCode(output)
+            return output.toString()
         }
+
+    fun writeCode(output: CodeWriter) {
+
+        if (name is LZeroSpecifiedArgumentName) {
+            output.write( name.text, " = ")
+        }
+
+        expression.writeCode(output)
+
+    }
+
 }
 
 //---------------------------------------------------------------------------------------------------------------------

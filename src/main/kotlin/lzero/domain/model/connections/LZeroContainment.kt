@@ -5,6 +5,7 @@
 
 package lzero.domain.model.connections
 
+import lzero.domain.generating.CodeWriter
 import lzero.domain.model.core.LZeroOrigin
 import lzero.domain.model.elements.LZeroElement
 
@@ -15,8 +16,10 @@ class LZeroContainment(
     val containedElements: List<LZeroElement>
 ) : LZeroConnection(origin) {
 
-    override val text =
-        containedElements.joinToString("\n", " {\n", "\n}") { e -> e.text }
+    override fun writeCode(output: CodeWriter) =
+        output.writeBraceSemicolonBlock(containedElements) { e ->
+            e.writeCode(this)
+        }
 
 }
 

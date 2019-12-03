@@ -5,6 +5,7 @@
 
 package lzero.domain.model.parameters
 
+import lzero.domain.generating.CodeWriter
 import lzero.domain.model.core.LZeroOrigin
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -13,7 +14,14 @@ abstract class LZeroParameterList(
     val origin: LZeroOrigin
 ) {
 
-    abstract val text: String
+    val code: String
+        get() {
+            val output = CodeWriter()
+            writeCode(output)
+            return output.toString()
+        }
+
+    abstract fun writeCode(output: CodeWriter)
 
 }
 

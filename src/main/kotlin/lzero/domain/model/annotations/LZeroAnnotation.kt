@@ -5,6 +5,7 @@
 
 package lzero.domain.model.annotations
 
+import lzero.domain.generating.CodeWriter
 import lzero.domain.model.arguments.LZeroArgumentList
 import lzero.domain.model.core.LZeroOrigin
 import lzero.domain.model.names.LZeroName
@@ -17,8 +18,17 @@ class LZeroAnnotation(
     val arguments: LZeroArgumentList
 ) {
 
-    val text =
-        "@" + qualifiedName.text + arguments.text
+    val code: String
+        get() {
+            val output = CodeWriter()
+            writeCode(output)
+            return output.toString()
+        }
+
+    fun writeCode(output: CodeWriter) {
+        output.write( "@", qualifiedName.text )
+        arguments.writeCode(output)
+    }
 
 }
 

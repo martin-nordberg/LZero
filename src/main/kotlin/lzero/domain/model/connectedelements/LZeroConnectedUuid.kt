@@ -5,6 +5,7 @@
 
 package lzero.domain.model.connectedelements
 
+import lzero.domain.generating.CodeWriter
 import lzero.domain.model.uuids.LZeroKnownUuid
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -13,8 +14,9 @@ class LZeroConnectedUuid(
     val uuid: LZeroKnownUuid
 ) : LZeroConnectedElement(uuid.origin) {
 
-    override val text =
-        uuid.text
+    override fun writeCode(output: CodeWriter) {
+        output.write(uuid.text)
+    }
 
 }
 

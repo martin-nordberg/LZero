@@ -5,6 +5,7 @@
 
 package lzero.domain.model.elements
 
+import lzero.domain.generating.CodeWriter
 import lzero.domain.model.annotations.LZeroAnnotationList
 import lzero.domain.model.connections.LZeroConnectionList
 import lzero.domain.model.documentation.LZeroDocumentation
@@ -26,38 +27,34 @@ class LZeroDeclaration(
     val connections: LZeroConnectionList
 ) : LZeroElement(concept.origin, documentation) {
 
-    override val text: String
-        get() {
+    override fun writeCode(output: CodeWriter) {
 
-            var result: String = documentation.text
-
-            if (result.isNotEmpty()) {
-                result += "\n"
-            }
-
-            result += annotations.annotations.joinToString(" ") { a -> a.text }
-
-            if (annotations.annotations.isNotEmpty()) {
-                result += "\n"
-            }
-
-            result += concept.text
-
-            if (qualifiedName !is LZeroNullName) {
-                result += " " + qualifiedName.text
-            }
-
-            if (uuid is LZeroKnownUuid) {
-                result += " " + uuid.text
-            }
-
-            result += parameters.text
-
-            result += connections.text
-
-            return result
-
+        if (documentation.text.isNotEmpty()) {
+            output.write(documentation.text)
+            output.writeNewLine()
         }
+
+        annotations.writeCode(output)
+
+        if (annotations.isNotEmpty()) {
+            output.writeNewLine()
+        }
+
+        output.write(concept.text)
+
+        if (qualifiedName !is LZeroNullName) {
+            output.write(" ", qualifiedName.text)
+        }
+
+        if (uuid is LZeroKnownUuid) {
+            output.write(" ", uuid.text)
+        }
+
+        parameters.writeCode(output)
+
+        connections.writeCode(output)
+
+    }
 
 }
 

@@ -17,7 +17,7 @@ class LZeroParserConceptTests {
         val parser = LZeroParser("test.lzero", code)
         val element = parser.parseElement()
 
-        assertEquals(code, element.text)
+        assertEquals(code, element.code)
     }
 
     @Test
@@ -139,7 +139,7 @@ class LZeroParserConceptTests {
     fun `A concept with an implicit connection is parsed`() {
 
         val code = """
-            #example sample.test(a: A, b: B, c: C): p.q.R
+            #example sample.test(a: A, b: B, c: C) : p.q.R
         """.trimIndent()
 
         checkParseAndGenerate(code)
@@ -172,7 +172,7 @@ class LZeroParserConceptTests {
     fun `A concept with an explicit connection to multiple items is parsed`() {
 
         val code = """
-            #example sample.test(a: A, b: B, c: C) ~uses~> [ x.y.Z, e.f.G ]
+            #example sample.test(a: A, b: B, c: C) ~uses~> [x.y.Z, e.f.G]
         """.trimIndent()
 
         checkParseAndGenerate(code)
@@ -183,9 +183,18 @@ class LZeroParserConceptTests {
     fun `A concept with a containment is parsed`() {
 
         val code = """
-            #example sample.test(a: A, b: B, c: C) ~uses~> x.y.Z {
-            #subitem qwerty
-            }
+            #example sample.test(a: A, b: B, c: C) ~uses~> x.y.Z { #subitem qwerty }
+        """.trimIndent()
+
+        checkParseAndGenerate(code)
+
+    }
+
+    @Test
+    fun `A concept with two containments is parsed`() {
+
+        val code = """
+            #example sample.test(a: A, b: B, c: C) ~uses~> x.y.Z { #subitem qwerty; #subitem asdf }
         """.trimIndent()
 
         checkParseAndGenerate(code)
@@ -197,9 +206,19 @@ class LZeroParserConceptTests {
 
         val code = """
             #example sample.test(a: A, b: B, c: C) ~uses~> x.y.Z {
-            #subitem qwerty
-            #another asdf
+              #subitem qwerty; #another asdf; #athird zxcv
             }
+        """.trimIndent()
+
+        checkParseAndGenerate(code)
+
+    }
+
+    @Test
+    fun `A concept with no contained items is parsed`() {
+
+        val code = """
+            #example sample.test(a: A, b: B, c: C) ~uses~> x.y.Z {}
         """.trimIndent()
 
         checkParseAndGenerate(code)
@@ -210,10 +229,8 @@ class LZeroParserConceptTests {
     fun `A concept with all kinds of connections is parsed`() {
 
         val code = """
-            #example sample.test(a: A, b: B, c: C): p.q.R ~uses~> x.y.Z ~extends~> e.f.G {
-            #subitem qwerty
-            #another asdf = "5"
-            #aUuid %11111111-2222-3333-4444-555555555555%
+            #example sample.test(a: A, b: B, c: C) : p.q.R ~uses~> x.y.Z ~extends~> e.f.G {
+              #subitem qwerty; #another asdf = "5"; #aUuid %11111111-2222-3333-4444-555555555555%
             }
         """.trimIndent()
 
